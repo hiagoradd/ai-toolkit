@@ -345,7 +345,7 @@
       "extends": "platform-mobile",
       "status": "ready",
       "rules": 11,
-      "version": 3
+      "version": 4
     },
     {
       "name": "rewrite-commit-history",

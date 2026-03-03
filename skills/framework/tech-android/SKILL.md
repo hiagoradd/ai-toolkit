@@ -1,6 +1,8 @@
 ---
 name: tech-android
-description: "Android and Kotlin development patterns — Compose, architecture, coroutines, Room, navigation, Hilt. Use when building Android apps, writing Jetpack Compose UI, or reviewing Android-specific code."
+description: Android and Kotlin development patterns — Compose, architecture, coroutines,
+  Room, navigation, Hilt. Use when building Android apps, writing Jetpack Compose
+  UI, or reviewing Android-specific code.
 metadata:
   category: framework
   extends: platform-mobile
@@ -11,7 +13,7 @@ metadata:
   - jetpack
   - mobile
   status: ready
-  version: 3
+  version: 4
 ---
 
 # Android & Kotlin Patterns
