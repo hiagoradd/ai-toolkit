@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-03-03
+
+- Added rewrite-commit-history skill. (#13)
 ## 2026-03-02
 
 - Added figma-to-react-components skill. (#12)

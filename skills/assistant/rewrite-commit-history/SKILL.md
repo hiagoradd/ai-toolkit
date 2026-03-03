@@ -1,18 +1,23 @@
 ---
 name: rewrite-commit-history
-description: >
-  Rewrite a feature branch's commit history into clean conventional commits
-  that tell a progressive, linear story. Handles backup, soft reset, and
-  atomic recommit. Use when: (1) Cleaning up messy WIP commits before PR,
-  (2) Reorganizing commits into logical units, (3) Converting commits to
-  conventional commit format. Triggers on: "rewrite history", "clean up
-  commits", "rewrite commits", "conventional commits", "squash and rewrite",
-  "reorganize commits".
+description: 'Rewrite a feature branch''s commit history into clean conventional commits
+  that tell a progressive, linear story. Handles backup, soft reset, and atomic recommit.
+  Use when: (1) Cleaning up messy WIP commits before PR, (2) Reorganizing commits
+  into logical units, (3) Converting commits to conventional commit format. Triggers
+  on: "rewrite history", "clean up commits", "rewrite commits", "conventional commits",
+  "squash and rewrite", "reorganize commits".
+
+  '
 metadata:
   category: assistant
-  tags: [git, commits, history, conventional-commits, rewrite]
+  tags:
+  - git
+  - commits
+  - history
+  - conventional-commits
+  - rewrite
   status: ready
-  version: 1
+  version: 2
 ---
 
 # Rewrite Commit History
