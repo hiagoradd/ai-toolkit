@@ -108,7 +108,7 @@ Post each reply to its corresponding comment thread.
 
 ### Positive Trigger
 
-User: "address the review comments on PR #42"
+User: "address the review comments and fix the code feedback on PR #42"
 
 Expected behavior: Use `pr-comments-address` to fetch comments from PR #42, triage them into clear fix / ambiguous / discussion-only, present the triage table, and wait for user input before making changes.
 
@@ -126,7 +126,7 @@ Expected behavior: Use `pr-comments-address` with the provided PR URL, fetch com
 
 ### Non-Trigger
 
-User: "review this pull request: https://github.com/org/repo/pull/123"
+User: "review this pull request #123"
 
 Expected behavior: Do not use `pr-comments-address`. The user wants to review a PR, not address existing comments. Use a PR review workflow instead.
 
