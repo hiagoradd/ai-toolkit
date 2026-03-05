@@ -361,6 +361,23 @@
       ],
       "status": "ready",
       "version": 2
+    },
+    {
+      "name": "pr-comments-address",
+      "source": "./skills/assistant/pr-comments-address",
+      "description": "Reads open review comments from a GitHub PR, triages them, applies code fixes, and drafts reply messages. Use when user wants to address PR comments, says 'address review comments', 'fix PR feedback', 'handle PR comments', 'respond to review', or mentions addressing code review feedback on a pull request.",
+      "category": "assistant",
+      "tags": [
+        "git",
+        "pull-request",
+        "github",
+        "code-review",
+        "workflow",
+        "automation",
+        "gh-cli"
+      ],
+      "status": "ready",
+      "version": 1
     }
   ],
   "drafts": [
