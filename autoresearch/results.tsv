@@ -12,3 +12,4 @@ fe32c3d	100.0	keep	add quality rule for long transcripts
 de55d0f	100.0	keep	add quality rule to preserve speaker terminology
 628502f	100.0	keep	broaden supported transcript formats in prerequisites
 73215bd	100.0	keep	add quality rule for outcome-focused TL;DR
+54083da	100.0	keep	add troubleshooting for non-English transcripts

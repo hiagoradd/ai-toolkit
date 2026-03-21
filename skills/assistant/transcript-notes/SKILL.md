@@ -129,3 +129,7 @@ Expected behavior: This is meeting agenda creation, not transcript processing. T
 - Error: Transcript has no speaker labels
   - Cause: Raw transcript is a continuous text block without speaker attribution (e.g., auto-generated without diarization).
   - Solution: Ask user if speaker info is available separately; otherwise attribute all content to "Unknown Speaker" and note the limitation in metadata.
+
+- Error: Transcript is in a non-English language
+  - Cause: Meeting was conducted in another language.
+  - Solution: Write notes in the same language as the transcript unless user requests translation. Keep all quotes in the original language.
