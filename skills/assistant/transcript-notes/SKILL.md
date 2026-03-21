@@ -91,6 +91,7 @@ Convert a raw meeting transcript `.txt` file into a structured `.md` notes file.
 - Series slug for directory: kebab-case version of series name
 - Optional metadata fields (Date, Duration) — include only when inferable from transcript content
 - Long transcripts (>5000 words) — process in sections, then merge; do not truncate or skip content
+- Preserve speaker terminology — keep acronyms, jargon, and domain-specific terms as spoken; do not rephrase or "clean up" technical language
 
 ## Examples
 

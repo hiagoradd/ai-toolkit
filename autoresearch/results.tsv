@@ -9,3 +9,4 @@ fe32c3d	100.0	keep	add quality rule for long transcripts
 110f720	100.0	keep	use more deceptive non-trigger (meeting agenda creation, 1 hit vs 12)
 1da7ba1	100.0	keep	add troubleshooting for missing speaker labels
 2e01016	100.0	keep	clarify output filename for non-numeric transcript names
+de55d0f	100.0	keep	add quality rule to preserve speaker terminology
