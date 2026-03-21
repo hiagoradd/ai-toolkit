@@ -6,3 +6,4 @@ cdbbdd7	82.9	keep	fix trigger format to User: quote pattern with singular headin
 4ba889f	100.0	keep	tighten description wording
 db48a49	100.0	keep	add speaker disambiguation troubleshooting entry
 fe32c3d	100.0	keep	add quality rule for long transcripts
+110f720	100.0	keep	use more deceptive non-trigger (meeting agenda creation, 1 hit vs 12)

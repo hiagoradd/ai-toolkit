@@ -102,9 +102,9 @@ Expected behavior: Reads the transcript file, extracts participants, topics, act
 
 ### Non-Trigger
 
-User: "Summarize this PDF document into bullet points"
+User: "Create a template agenda for our weekly sync meeting"
 
-Expected behavior: This is a general summarization request, not transcript processing. Use a general-purpose summarization approach instead.
+Expected behavior: This is meeting agenda creation, not transcript processing. The user wants to plan a future meeting, not convert an existing recording.
 
 ## Troubleshooting
 
