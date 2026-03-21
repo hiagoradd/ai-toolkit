@@ -5,3 +5,4 @@ cdbbdd7	82.9	keep	fix trigger format to User: quote pattern with singular headin
 30ae325	100.0	keep	boost positive trigger keyword overlap (8→12 hits)
 4ba889f	100.0	keep	tighten description wording
 db48a49	100.0	keep	add speaker disambiguation troubleshooting entry
+fe32c3d	100.0	keep	add quality rule for long transcripts

@@ -90,6 +90,7 @@ Convert a raw meeting transcript `.txt` file into a structured `.md` notes file.
 - Use `--` (double dash) not `—` (em dash) for separators in topic summaries and quotes
 - Series slug for directory: kebab-case version of series name
 - Optional metadata fields (Date, Duration) — include only when inferable from transcript content
+- Long transcripts (>5000 words) — process in sections, then merge; do not truncate or skip content
 
 ## Examples
 
