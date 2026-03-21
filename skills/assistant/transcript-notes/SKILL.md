@@ -137,3 +137,7 @@ Expected behavior: This is meeting agenda creation, not transcript processing. T
 - Error: Transcript is in a non-English language
   - Cause: Meeting was conducted in another language.
   - Solution: Write notes in the same language as the transcript unless user requests translation. Keep all quotes in the original language.
+
+- Error: Multiple transcript files for one meeting (Part 1, Part 2)
+  - Cause: Recording was split into segments.
+  - Solution: Read all parts in order and produce a single unified notes file. De-duplicate topics that span the split point.

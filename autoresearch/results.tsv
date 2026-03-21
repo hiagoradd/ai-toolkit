@@ -19,3 +19,4 @@ b3b6fb2	100.0	keep	make verification step concrete with specific checks
 682eb6c	100.0	keep	add action-items and summary tags for discoverability
 f003ffc	100.0	keep	add quality rule for chronological topic ordering
 0a8a7c2	100.0	keep	make output template flexible for non-episodic meetings
+86ef3e7	100.0	keep	add troubleshooting for multi-part transcripts
