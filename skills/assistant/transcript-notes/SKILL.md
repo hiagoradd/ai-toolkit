@@ -38,7 +38,7 @@ Convert a raw meeting transcript `.txt` file into a structured `.md` notes file.
 - **TL;DR:** Single paragraph, 2-4 sentences, captures the meeting's purpose and key outcomes
 - **Key Topics:** Each topic gets a `**bold title** -- one-line summary` bullet, then a `###` subsection with 2-5 sentences or bullets expanding it
 - **Action Items:** `**Person/Group:** action description` format
-- **Quotes:** 3-5 notable quotes using `> "quote" -- Speaker Name (context)` format
+- **Quotes:** 3-5 notable quotes using `> "quote" -- Speaker Name (context)` format — prioritize quotes that capture decisions, insights, or strong positions over casual remarks
 
 ### 3. Write & Verify
 
