@@ -43,7 +43,7 @@ Convert a raw meeting transcript `.txt` file into a structured `.md` notes file.
 ### 3. Write & Verify
 
 - Create the notes directory if it doesn't exist: `notes/{series-slug}/`
-- Write the `.md` file mirroring the transcript number (e.g., `001.txt` → `001.md`)
+- Write the `.md` file mirroring the transcript filename (e.g., `001.txt` → `001.md`, `kickoff-meeting.txt` → `kickoff-meeting.md`)
 - Verify structure matches the output template
 
 ## Output Template
