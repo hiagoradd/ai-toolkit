@@ -1,11 +1,10 @@
 ---
 name: type-system-audit
-description: >-
-  Audit a repository for type-system weaknesses using recent bug-fix commits as
-  hard evidence. Produces prioritized findings and refactors tied to specific
-  commits. Use when: reviewing type safety, auditing types, analyzing type bugs.
-  Triggers on: "type audit", "type system review", "audit types", "type safety
-  audit", "type-system audit".
+description: 'Audit a repository for type-system weaknesses using recent bug-fix commits
+  as hard evidence. Produces prioritized findings and refactors tied to specific commits.
+  Use when: reviewing type safety, auditing types, analyzing type bugs. Triggers on:
+  "type audit", "type system review", "audit types", "type safety audit", "type-system
+  audit".'
 metadata:
   category: assistant
   tags:
@@ -14,7 +13,7 @@ metadata:
   - static-analysis
   - code-quality
   status: ready
-  version: 2
+  version: 3
 ---
 
 # Type-System Audit: Commit-First, Not Theory-First

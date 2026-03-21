@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-03-21
+
+- Added type-system-audit skill and skill scoring script.
 ## 2026-03-10
 
 - Added localize-ios skill. (#15)
