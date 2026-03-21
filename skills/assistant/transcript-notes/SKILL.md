@@ -21,7 +21,7 @@ Convert a raw meeting transcript `.txt` file into a structured `.md` notes file.
 
 ## Prerequisites
 
-- Raw transcript `.txt` file with speaker-turn format (speaker name on its own line, dialogue as paragraph)
+- Raw transcript `.txt` file — supports speaker-turn format (speaker name on its own line, dialogue as paragraph) and timestamped formats (e.g., `[00:01:23] Speaker: text`)
 - Target notes directory exists or will be created
 
 ## Workflow

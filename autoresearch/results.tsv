@@ -10,3 +10,4 @@ fe32c3d	100.0	keep	add quality rule for long transcripts
 1da7ba1	100.0	keep	add troubleshooting for missing speaker labels
 2e01016	100.0	keep	clarify output filename for non-numeric transcript names
 de55d0f	100.0	keep	add quality rule to preserve speaker terminology
+628502f	100.0	keep	broaden supported transcript formats in prerequisites
