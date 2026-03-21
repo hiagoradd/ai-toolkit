@@ -107,6 +107,14 @@ Expected behavior: This is a general summarization request, not transcript proce
 
 ## Troubleshooting
 
-- **Cannot determine series name** — Cause: transcript has no meeting context. Solution: ask user for series name.
-- **No clear action items** — Cause: meeting was informational only. Solution: write "No action items identified" or extract implicit next steps.
-- **Cannot estimate duration** — Cause: no timing cues in transcript. Solution: omit Duration from metadata.
+- Error: Cannot determine series name
+  - Cause: Transcript has no meeting context or header identifying the series.
+  - Solution: Ask user for the series name before proceeding.
+
+- Error: No clear action items found
+  - Cause: Meeting was informational only with no commitments or next steps.
+  - Solution: Write "No action items identified" in the Action Items section, or extract implicit next steps.
+
+- Error: Cannot estimate duration
+  - Cause: No timing cues, timestamps, or length indicators in transcript.
+  - Solution: Omit Duration from the Meeting Metadata section.
