@@ -59,7 +59,7 @@ Reply with ONLY a JSON object (no markdown fences):
 {{"section": "which rule/gate", "change_description": "what to change and why", "old_text": "exact text to find in the file", "new_text": "replacement text"}}"""
 
 
-def claude_pipe(prompt: str, model: str = "sonnet") -> str:
+def claude_pipe(prompt: str, model: str = "sonnet", timeout: int = 120) -> str:
     system = "You are a prompt engineering assistant. Reply with only the requested JSON."
     with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(system)
@@ -71,7 +71,7 @@ def claude_pipe(prompt: str, model: str = "sonnet") -> str:
             input=prompt,
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=timeout,
         )
     finally:
         sys_file.unlink(missing_ok=True)
@@ -80,12 +80,21 @@ def claude_pipe(prompt: str, model: str = "sonnet") -> str:
     return result.stdout.strip()
 
 
+def _count_scenarios(scenarios_file: Path, scenario_ids: list[str] | None) -> int:
+    scenarios = yaml.safe_load(scenarios_file.read_text())
+    if scenario_ids:
+        return len([s for s in scenarios if s["id"] in scenario_ids])
+    return len(scenarios)
+
+
 def run_eval(target: Path, scenarios_file: Path, scenario_ids: list[str] | None, runs: int, model: str) -> dict:
     cmd = [str(EVAL_SCRIPT), "--runs", str(runs), "--model", model,
            "--claude-md", str(target), "--scenarios-file", str(scenarios_file)]
     if scenario_ids:
         cmd.extend(scenario_ids)
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    n = _count_scenarios(scenarios_file, scenario_ids)
+    timeout = max(300, n * runs * 60 + 120)
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     if result.returncode != 0:
         print(f"  Eval stderr: {result.stderr[:300]}", file=sys.stderr)
     results_dir = SKILL_DIR / "results"
@@ -102,7 +111,9 @@ def run_ab(baseline: Path, mutated: Path, scenarios_file: Path,
            "--scenarios-file", str(scenarios_file)]
     if scenario_ids:
         cmd.extend(scenario_ids)
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    n = _count_scenarios(scenarios_file, scenario_ids)
+    timeout = max(300, n * runs * 60 * 2 + 120)  # 2x for baseline + mutated
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     return result, result.stdout
 
 
@@ -132,7 +143,9 @@ def generate_mutation(config_content: str, scenario: dict, scenarios_file: Path)
         failure_evidence=evidence,
     )
 
-    raw = claude_pipe(prompt, model="sonnet")
+    line_count = len(config_content.splitlines())
+    timeout = max(120, line_count // 5)
+    raw = claude_pipe(prompt, model="sonnet", timeout=timeout)
     text = raw.strip()
     if text.startswith("```"):
         text = "\n".join(text.split("\n")[1:])

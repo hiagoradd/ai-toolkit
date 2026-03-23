@@ -39,6 +39,7 @@ def claude_pipe(
     prompt: str,
     model: str | None = None,
     system_file: Path | None = None,
+    timeout: int = 120,
 ) -> str:
     cmd = ["claude", "-p", "--output-format", "text"]
     if model:
@@ -50,7 +51,7 @@ def claude_pipe(
         input=prompt,
         capture_output=True,
         text=True,
-        timeout=600,
+        timeout=timeout,
     )
     if result.returncode != 0:
         raise RuntimeError(

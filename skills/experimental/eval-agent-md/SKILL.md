@@ -37,7 +37,7 @@ This skill runs long operations (30s-5min per step). **Always keep the user info
 - Before each step, tell the user what is about to happen and roughly how long it takes
 - Run all scripts via the Bash tool (never capture output) so per-scenario progress streams to the user in real time
 - After each step completes, give a brief transition summary before starting the next step
-- Set an appropriate timeout on Bash calls (120s for generation, 600s for eval/mutation)
+- Script timeouts are computed dynamically from workload size (scenario count, runs, file length) — no manual timeout tuning needed on Bash calls
 
 ### Step 1: Locate the target file
 

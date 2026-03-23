@@ -114,7 +114,7 @@ A "runner" agent should execute commands but NOT edit source files.
 """
 
 
-def claude_pipe(prompt: str, model: str = "sonnet") -> str:
+def claude_pipe(prompt: str, model: str = "sonnet", timeout: int = 120) -> str:
     with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
         f.write(SYSTEM_PROMPT)
         sys_file = Path(f.name)
@@ -125,7 +125,7 @@ def claude_pipe(prompt: str, model: str = "sonnet") -> str:
             input=prompt,
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=timeout,
         )
     finally:
         sys_file.unlink(missing_ok=True)
@@ -160,7 +160,9 @@ def generate_scenarios(config_path: Path, is_agent: bool = False) -> list[dict]:
 
 Generate the JSON array now."""
 
-    raw = claude_pipe(prompt)
+    line_count = len(content.splitlines())
+    timeout = max(120, line_count // 5)
+    raw = claude_pipe(prompt, timeout=timeout)
 
     # Extract JSON from response
     text = raw.strip()
