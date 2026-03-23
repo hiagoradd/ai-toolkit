@@ -12,13 +12,16 @@ Usage:
     ./eval-behavioral.py --scenarios-file scenarios.yaml --claude-md ~/.claude/CLAUDE.md
     ./eval-behavioral.py --scenarios-file s.yaml --claude-md config.md --runs 3
     ./eval-behavioral.py --scenarios-file s.yaml --claude-md config.md --compare-models
+    ./eval-behavioral.py --scenarios-file s.yaml --claude-md config.md --workers 8
 """
 import argparse
 import json
 import subprocess
 import sys
 import tempfile
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -34,12 +37,19 @@ Reply with ONLY valid JSON, no markdown fences, no commentary.
 Keep the "evidence" field under 100 characters.
 Format: {"verdict":"PASS","evidence":"...","triggered_criteria":[],"triggered_fail_signals":[]}"""
 
+_print_lock = threading.Lock()
+
+
+def _tprint(*args, **kwargs):
+    with _print_lock:
+        print(*args, **kwargs)
+
 
 def claude_pipe(
     prompt: str,
     model: str | None = None,
     system_file: Path | None = None,
-    timeout: int = 120,
+    timeout: int = 300,
 ) -> str:
     cmd = ["claude", "-p", "--output-format", "text"]
     if model:
@@ -79,7 +89,7 @@ def load_scenarios(path: Path, ids: list[str] | None = None) -> list[dict]:
     return scenarios
 
 
-def judge(scenario: dict, response: str) -> dict:
+def judge(scenario: dict, response: str, timeout: int = 300) -> dict:
     judge_prompt = f"""## Rule Being Tested
 {scenario['rule']}
 
@@ -99,7 +109,7 @@ def judge(scenario: dict, response: str) -> dict:
         f.write(JUDGE_SYSTEM)
         judge_file = Path(f.name)
     try:
-        raw = claude_pipe(judge_prompt, model="haiku", system_file=judge_file)
+        raw = claude_pipe(judge_prompt, model="haiku", system_file=judge_file, timeout=timeout)
     finally:
         judge_file.unlink(missing_ok=True)
 
@@ -120,21 +130,37 @@ def judge(scenario: dict, response: str) -> dict:
         }
 
 
-def run_scenario(model: str, system_file: Path, scenario: dict, runs: int) -> dict:
+def _single_run(model: str, effective_file: Path, scenario: dict, run_num: int, timeout: int) -> dict:
+    response = claude_pipe(scenario["prompt"], model=model, system_file=effective_file, timeout=timeout)
+    result = judge(scenario, response, timeout=timeout)
+    result["response_preview"] = response[:500]
+    result["run"] = run_num
+    return result
+
+
+def run_scenario(model: str, system_file: Path, scenario: dict, runs: int,
+                 timeout: int = 300, max_workers: int = 5) -> dict:
     effective_file = system_file
     if scenario.get("agent_md"):
         agent_path = Path(scenario["agent_md"]).expanduser()
         if agent_path.exists():
             effective_file = agent_path
         else:
-            print(f"\n  Warning: agent_md not found: {agent_path}", file=sys.stderr)
-    verdicts = []
-    for r in range(runs):
-        response = claude_pipe(scenario["prompt"], model=model, system_file=effective_file)
-        result = judge(scenario, response)
-        result["response_preview"] = response[:500]
-        result["run"] = r + 1
-        verdicts.append(result)
+            _tprint(f"\n  Warning: agent_md not found: {agent_path}", file=sys.stderr)
+
+    if runs == 1:
+        verdicts = [_single_run(model, effective_file, scenario, 1, timeout)]
+    else:
+        verdicts = []
+        workers = min(runs, max_workers)
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {
+                pool.submit(_single_run, model, effective_file, scenario, r + 1, timeout): r
+                for r in range(runs)
+            }
+            for fut in as_completed(futures):
+                verdicts.append(fut.result())
+        verdicts.sort(key=lambda v: v["run"])
 
     passes = sum(1 for v in verdicts if v["verdict"] == "PASS")
     return {
@@ -146,6 +172,39 @@ def run_scenario(model: str, system_file: Path, scenario: dict, runs: int) -> di
         "final_verdict": "PASS" if passes > runs / 2 else "FAIL",
         "details": verdicts,
     }
+
+
+def run_scenarios_parallel(scenarios: list[dict], model: str, system_file: Path,
+                           runs: int, timeout: int, max_workers: int) -> list[dict]:
+    total = len(scenarios)
+    results_by_index: dict[int, dict] = {}
+    workers = min(max_workers, total)
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        future_to_idx = {}
+        for i, s in enumerate(scenarios):
+            fut = pool.submit(run_scenario, model, system_file, s, runs, timeout, max_workers)
+            future_to_idx[fut] = i
+
+        for fut in as_completed(future_to_idx):
+            idx = future_to_idx[fut]
+            try:
+                r = fut.result()
+            except Exception as exc:
+                s = scenarios[idx]
+                _tprint(f"\n[{idx + 1}/{total}] {s['id']}... ERROR: {exc}")
+                r = {
+                    "id": s["id"], "rule": s["rule"], "runs": runs,
+                    "passes": 0, "fails": runs, "final_verdict": "FAIL",
+                    "details": [{"verdict": "ERROR", "evidence": str(exc)[:200], "run": j + 1,
+                                 "triggered_criteria": [], "triggered_fail_signals": []}
+                                for j in range(runs)],
+                }
+            t_evidence = r["details"][0].get("evidence", "") if r["details"] else ""
+            _tprint(f"[{idx + 1}/{total}] {r['id']:<25} {r['final_verdict']}  ({r['passes']}/{r['runs']})")
+            results_by_index[idx] = r
+
+    return [results_by_index[i] for i in range(total)]
 
 
 def print_results(results: list[dict], label: str = ""):
@@ -196,6 +255,8 @@ def main():
     parser.add_argument("--mutate", type=Path, help="Mutated config for A/B comparison")
     parser.add_argument("--compare-models", action="store_true", help="Run across haiku/sonnet/opus")
     parser.add_argument("--scenarios-file", type=Path, required=True, help="Path to scenarios YAML")
+    parser.add_argument("--workers", type=int, default=5, help="Max concurrent scenario workers (default: 5)")
+    parser.add_argument("--timeout", type=int, default=300, help="Per-call claude -p timeout in seconds (default: 300)")
 
     args = parser.parse_args()
     scenarios = load_scenarios(args.scenarios_file, args.scenarios or None)
@@ -204,7 +265,7 @@ def main():
         print("No scenarios to run.", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Testing {len(scenarios)} scenarios x {args.runs} run(s)")
+    print(f"Testing {len(scenarios)} scenarios x {args.runs} run(s)  [workers={args.workers}, timeout={args.timeout}s]")
     print(f"Subject: claude -p --model {args.model}")
     print(f"Judge:   claude -p --model haiku")
     print(f"Config:  {args.claude_md}")
@@ -212,20 +273,20 @@ def main():
     if args.compare_models:
         models = ["haiku", "sonnet", "opus"]
         all_model_results = {}
-        for model in models:
-            print(f"\n{'=' * 60}")
-            print(f"  Model: {model}")
-            print(f"{'=' * 60}")
-            model_results = []
-            for i, s in enumerate(scenarios, 1):
-                print(f"\n[{i}/{len(scenarios)}] {s['id']}...", end="", flush=True)
-                t0 = time.time()
-                r = run_scenario(model, args.claude_md, s, args.runs)
-                elapsed = time.time() - t0
-                print(f" {r['final_verdict']} ({elapsed:.1f}s)")
-                model_results.append(r)
-            print_results(model_results, f"Results — {model}")
-            all_model_results[model] = model_results
+
+        def _run_model(m):
+            _tprint(f"\n{'=' * 60}")
+            _tprint(f"  Model: {m}")
+            _tprint(f"{'=' * 60}")
+            return m, run_scenarios_parallel(scenarios, m, args.claude_md,
+                                             args.runs, args.timeout, args.workers)
+
+        with ThreadPoolExecutor(max_workers=len(models)) as pool:
+            futures = [pool.submit(_run_model, m) for m in models]
+            for fut in as_completed(futures):
+                model, model_results = fut.result()
+                print_results(model_results, f"Results — {model}")
+                all_model_results[model] = model_results
 
         comparison = {}
         sensitive = []
@@ -271,28 +332,15 @@ def main():
         print(f"\n  Comparison saved: {path}")
         sys.exit(0)
 
-    results = []
-    for i, s in enumerate(scenarios, 1):
-        print(f"\n[{i}/{len(scenarios)}] {s['id']}...", end="", flush=True)
-        t0 = time.time()
-        r = run_scenario(args.model, args.claude_md, s, args.runs)
-        elapsed = time.time() - t0
-        print(f" {r['final_verdict']} ({elapsed:.1f}s)")
-        results.append(r)
-
+    results = run_scenarios_parallel(scenarios, args.model, args.claude_md,
+                                     args.runs, args.timeout, args.workers)
     base_passed, _ = print_results(results, f"Results — {args.claude_md.name}")
     save_results(results, args.model, "baseline")
 
     if args.mutate:
         print(f"\nRunning mutated config: {args.mutate}")
-        mutated_results = []
-        for i, s in enumerate(scenarios, 1):
-            print(f"\n[{i}/{len(scenarios)}] {s['id']}...", end="", flush=True)
-            t0 = time.time()
-            r = run_scenario(args.model, args.mutate, s, args.runs)
-            elapsed = time.time() - t0
-            print(f" {r['final_verdict']} ({elapsed:.1f}s)")
-            mutated_results.append(r)
+        mutated_results = run_scenarios_parallel(scenarios, args.model, args.mutate,
+                                                 args.runs, args.timeout, args.workers)
 
         print_results(results, f"Baseline — {args.claude_md.name}")
         mut_passed, _ = print_results(mutated_results, f"Mutated — {args.mutate.name}")
