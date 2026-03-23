@@ -38,8 +38,10 @@ Read the file and confirm with the user: "I found your CLAUDE.md at [path] ([N] 
 Run the scenario generator script bundled with this skill:
 
 ```bash
-[SKILL_DIR]/scripts/generate-scenarios.py [TARGET_FILE] -o /tmp/eval-agent-md-scenarios.yaml
+[SKILL_DIR]/scripts/generate-scenarios.py [TARGET_FILE]
 ```
+
+The script auto-detects the repository name from git and saves to `/tmp/eval-agent-md-<repo>-scenarios.yaml` (e.g., `/tmp/eval-agent-md-my-project-scenarios.yaml`). Override with `--repo-name NAME` or `-o PATH`.
 
 This uses `claude -p --model sonnet` to analyze the CLAUDE.md and generate test scenarios. It typically takes 30-60 seconds.
 
@@ -54,7 +56,7 @@ Ask the user: "Generated [N] test scenarios. Ready to run? (Or edit/skip any?)"
 
 ```bash
 [SKILL_DIR]/scripts/eval-behavioral.py \
-  --scenarios-file /tmp/eval-agent-md-scenarios.yaml \
+  --scenarios-file /tmp/eval-agent-md-<repo>-scenarios.yaml \
   --claude-md [TARGET_FILE] \
   --runs 1 \
   --model sonnet
@@ -90,7 +92,7 @@ If the user says "improve", "fix", or passed `--improve`:
 ```bash
 [SKILL_DIR]/scripts/mutate-loop.py \
   --target [TARGET_FILE] \
-  --scenarios-file /tmp/eval-agent-md-scenarios.yaml \
+  --scenarios-file /tmp/eval-agent-md-<repo>-scenarios.yaml \
   --max-iterations 3 \
   --runs 3 \
   --model sonnet

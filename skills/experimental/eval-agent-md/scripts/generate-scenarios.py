@@ -199,10 +199,25 @@ Generate the JSON array now."""
     return valid
 
 
+def get_repo_name() -> str:
+    """Detect repository name from git, fall back to current directory name."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode == 0:
+            return Path(result.stdout.strip()).name
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        pass
+    return Path.cwd().name
+
+
 def main():
     parser = argparse.ArgumentParser(description="Generate behavioral test scenarios from CLAUDE.md")
     parser.add_argument("config", type=Path, help="Path to CLAUDE.md or agent .md file")
-    parser.add_argument("-o", "--output", type=Path, help="Output YAML file (default: stdout)")
+    parser.add_argument("-o", "--output", type=Path, help="Output YAML file (default: /tmp/eval-agent-md-<repo>-scenarios.yaml)")
+    parser.add_argument("--repo-name", default=None, help="Repository name for output filename (auto-detected from git)")
     parser.add_argument("--agent", action="store_true", help="Treat input as agent definition file")
     parser.add_argument("--model", default="sonnet", help="Model for generation (default: sonnet)")
 
@@ -222,10 +237,13 @@ def main():
     output = "\n\n".join(chunks) + "\n"
 
     if args.output:
-        args.output.write_text(output)
-        print(f"Saved to {args.output}", file=sys.stderr)
+        out_path = args.output
     else:
-        print(output)
+        repo_name = args.repo_name or get_repo_name()
+        out_path = Path(f"/tmp/eval-agent-md-{repo_name}-scenarios.yaml")
+
+    out_path.write_text(output)
+    print(f"Saved to {out_path}", file=sys.stderr)
 
 
 if __name__ == "__main__":
