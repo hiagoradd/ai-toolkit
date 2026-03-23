@@ -56,7 +56,7 @@ Tell the user: "Generating test scenarios from [filename]... this calls `claude 
 Run the scenario generator script bundled with this skill. **IMPORTANT: Do NOT capture output — run via the Bash tool so the user sees progress lines in real time:**
 
 ```bash
-[SKILL_DIR]/scripts/generate-scenarios.py [TARGET_FILE]
+uv run --script [SKILL_DIR]/scripts/generate-scenarios.py [TARGET_FILE]
 ```
 
 The script auto-detects the repository name from git and saves to `/tmp/eval-agent-md-<repo>-scenarios.yaml` (e.g., `/tmp/eval-agent-md-my-project-scenarios.yaml`). Override with `--repo-name NAME` or `-o PATH`.
@@ -75,7 +75,7 @@ Tell the user: "Running [N] scenarios x [runs] run(s) against [model]... each sc
 **IMPORTANT: Do NOT capture output — run via the Bash tool so the user sees per-scenario progress (`[1/N] scenario_id... PASS/FAIL (Xs)`) in real time:**
 
 ```bash
-[SKILL_DIR]/scripts/eval-behavioral.py \
+uv run --script [SKILL_DIR]/scripts/eval-behavioral.py \
   --scenarios-file /tmp/eval-agent-md-<repo>-scenarios.yaml \
   --claude-md [TARGET_FILE] \
   --runs 1 \
@@ -114,7 +114,7 @@ Tell the user: "Starting mutation loop (dry-run) — this iteratively generates 
 **IMPORTANT: Do NOT capture output — run via the Bash tool so the user sees iteration progress in real time:**
 
 ```bash
-[SKILL_DIR]/scripts/mutate-loop.py \
+uv run --script [SKILL_DIR]/scripts/mutate-loop.py \
   --target [TARGET_FILE] \
   --scenarios-file /tmp/eval-agent-md-<repo>-scenarios.yaml \
   --max-iterations 3 \
