@@ -159,6 +159,37 @@ def generate_mutation(config_content: str, scenario: dict, scenarios_file: Path)
         return None
 
 
+def _fmt_elapsed(start: float) -> str:
+    s = int(time.time() - start)
+    if s < 60:
+        return f"{s}s"
+    return f"{s // 60}m{s % 60:02d}s"
+
+
+def _progress(iteration: int, max_iter: int, scenario_id: str, phase: str,
+              start: float, stats: dict[str, int]) -> None:
+    elapsed = _fmt_elapsed(start)
+    kept, reverted, neutral = stats["kept"], stats["reverted"], stats["neutral"]
+    print(f"  [{iteration}/{max_iter}] {scenario_id} | {phase} | "
+          f"{elapsed} | kept:{kept} reverted:{reverted} neutral:{neutral}")
+
+
+def _print_summary_table(iteration_log: list[dict]) -> None:
+    if not iteration_log:
+        return
+    hdr = f"  {'Iter':>4}  {'Scenario':<24} {'Delta':>6}  {'Result':<10} Description"
+    print(f"\n{'=' * 60}")
+    print("  Iteration Summary")
+    print(f"{'=' * 60}")
+    print(hdr)
+    print(f"  {'-' * 4}  {'-' * 24} {'-' * 6}  {'-' * 10} {'-' * 30}")
+    for e in iteration_log:
+        delta_str = f"{e.get('delta', '-'):>+d}" if isinstance(e.get("delta"), int) else "  -"
+        desc = e.get("mutation", {}).get("change_description", "-") if isinstance(e.get("mutation"), dict) else "-"
+        desc = (desc[:40] + "...") if len(desc) > 43 else desc
+        print(f"  {e['iteration']:>4}  {e['target']:<24} {delta_str:>6}  {e['result']:<10} {desc}")
+
+
 def apply_mutation(config_content: str, mutation: dict) -> str | None:
     old_text = mutation.get("old_text", "")
     new_text = mutation.get("new_text", "")
@@ -195,13 +226,16 @@ def main():
     print(f"Runs per scenario: {args.runs}")
     print(f"Model: {args.model}")
 
+    t_start = time.time()
+    stats = {"kept": 0, "reverted": 0, "neutral": 0, "failed": 0}
+
     print(f"\n{'=' * 60}")
     print("  Baseline evaluation")
     print(f"{'=' * 60}")
     baseline_results = run_eval(args.target, args.scenarios_file, args.scenarios, args.runs, args.model)
     baseline_passed = baseline_results["summary"]["passed"]
     baseline_total = baseline_results["summary"]["total"]
-    print(f"  Baseline: {baseline_passed}/{baseline_total}")
+    print(f"  Baseline: {baseline_passed}/{baseline_total} ({_fmt_elapsed(t_start)})")
 
     failing = find_failing_scenarios(baseline_results)
     if not failing:
@@ -220,9 +254,10 @@ def main():
 
         target_scenario = failing[0]
         print(f"\n{'=' * 60}")
-        print(f"  Iteration {i}/{args.max_iterations} — targeting: {target_scenario['id']}")
+        print(f"  Iteration {i}/{args.max_iterations} — targeting: {target_scenario['id']} ({_fmt_elapsed(t_start)})")
         print(f"{'=' * 60}")
 
+        _progress(i, args.max_iterations, target_scenario["id"], "generating", t_start, stats)
         print("  Generating mutation...", end="", flush=True)
         t0 = time.time()
         mutation = generate_mutation(current_content, target_scenario, args.scenarios_file)
@@ -231,6 +266,7 @@ def main():
 
         if not mutation:
             print("  Failed to generate valid mutation. Skipping.")
+            stats["failed"] += 1
             iteration_log.append({"iteration": i, "target": target_scenario["id"],
                                   "result": "generation_failed"})
             failing = failing[1:]
@@ -242,6 +278,7 @@ def main():
         mutated_content = apply_mutation(current_content, mutation)
         if mutated_content is None:
             print(f"  old_text not found in config. Skipping.")
+            stats["failed"] += 1
             iteration_log.append({"iteration": i, "target": target_scenario["id"],
                                   "result": "text_not_found", "mutation": mutation})
             failing = failing[1:]
@@ -252,6 +289,7 @@ def main():
             mutated_path = Path(f.name)
 
         try:
+            _progress(i, args.max_iterations, target_scenario["id"], "A/B test", t_start, stats)
             print("  Running A/B comparison...", flush=True)
             ab_result, ab_stdout = run_ab(args.target, mutated_path, args.scenarios_file,
                                           args.scenarios, args.runs, args.model)
@@ -275,6 +313,7 @@ def main():
             iteration_log.append(entry)
 
             if delta > 0:
+                stats["kept"] += 1
                 print(f"  KEEP — delta: {delta:+d}")
                 if args.apply:
                     args.target.write_text(mutated_content)
@@ -284,17 +323,24 @@ def main():
                     print(f"  (dry-run — mutation NOT applied)")
                     current_content = mutated_content
             elif delta == 0:
+                stats["neutral"] += 1
                 print(f"  NEUTRAL — delta: 0 (not keeping)")
             else:
+                stats["reverted"] += 1
                 print(f"  REVERT — delta: {delta:+d}")
+            _progress(i, args.max_iterations, target_scenario["id"], "done", t_start, stats)
         finally:
             mutated_path.unlink(missing_ok=True)
 
         if args.apply and delta > 0:
+            _progress(i, args.max_iterations, target_scenario["id"], "re-eval", t_start, stats)
             reeval = run_eval(args.target, args.scenarios_file, args.scenarios, args.runs, args.model)
             failing = find_failing_scenarios(reeval)
         else:
             failing = failing[1:]
+
+    _print_summary_table(iteration_log)
+    print(f"\n  Total elapsed: {_fmt_elapsed(t_start)}")
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     log_path = RESULTS_DIR / f"mutation-log-{ts}.json"
