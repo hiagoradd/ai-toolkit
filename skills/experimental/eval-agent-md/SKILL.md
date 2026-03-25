@@ -17,7 +17,7 @@ metadata:
   - meta
   - quality
   status: experimental
-  version: 4
+  version: 5
 ---
 
 # eval-agent-md — Behavioral Compliance Testing

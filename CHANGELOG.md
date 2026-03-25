@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-03-25
+
+- Added --holistic integration scenarios for multi-rule testing.
 ## 2026-03-23
 
 - Improved skill quality with progressive disclosure and convention fixes.
