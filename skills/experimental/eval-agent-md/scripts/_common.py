@@ -48,26 +48,30 @@ def strip_markdown_fences(text: str) -> str:
     return text
 
 
-def _extract_text_from_json_result(raw_json: str) -> str:
-    """Extract text from claude -p --output-format json response.
+def _extract_from_stream_json(stdout: str) -> str:
+    """Extract text content from stream-json output.
 
-    The JSON result object has a 'result' field that should contain the text.
-    In some Claude Code versions (e.g. 2.1.83), 'result' may be empty even
-    though the model produced content. Fall back to extracting from the
-    stream-json assistant message content if needed.
+    Parses NDJSON lines, extracts text blocks from assistant messages,
+    falling back to the result field.
     """
-    try:
-        data = json.loads(raw_json)
-    except json.JSONDecodeError:
-        return raw_json.strip()
-
-    # Primary: use the result field
-    result_text = data.get("result", "")
-    if result_text:
-        return result_text.strip()
-
-    # Fallback not available in non-stream JSON — return whatever we got
-    return result_text
+    text_parts: list[str] = []
+    result_text = ""
+    for line in stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            msg = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if msg.get("type") == "assistant":
+            content = msg.get("message", {}).get("content", [])
+            for block in content:
+                if isinstance(block, dict) and block.get("type") == "text":
+                    text_parts.append(block["text"])
+        elif msg.get("type") == "result":
+            result_text = msg.get("result", "")
+    return "\n".join(text_parts) if text_parts else result_text
 
 
 def claude_pipe(
@@ -83,9 +87,9 @@ def claude_pipe(
     Provide either system_prompt (string, written to temp file) or
     system_file (path used directly). If both given, system_file wins.
 
-    Uses --output-format stream-json --verbose to reliably extract content
-    from assistant messages, working around a bug in some Claude Code versions
-    where --output-format text/json returns an empty 'result' field.
+    Tries --output-format text first (fast). If the result is empty (known
+    bug in Claude Code v2.1.83), retries with --output-format stream-json
+    --verbose and extracts content from assistant messages.
     """
     tmp_file = None
     if system_prompt and not system_file:
@@ -95,49 +99,43 @@ def claude_pipe(
         system_file = Path(tmp.name)
         tmp_file = system_file
 
-    cmd = ["claude", "-p", "--output-format", "stream-json", "--verbose"]
+    base_cmd = ["claude", "-p"]
     if model:
-        cmd.extend(["--model", model])
+        base_cmd.extend(["--model", model])
     if system_file:
-        cmd.extend(["--system-prompt-file", str(system_file)])
+        base_cmd.extend(["--system-prompt-file", str(system_file)])
 
     try:
+        # Fast path: --output-format text
+        cmd = [*base_cmd, "--output-format", "text"]
         result = subprocess.run(
             cmd, input=prompt, capture_output=True, text=True, timeout=timeout,
         )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"claude -p failed (rc={result.returncode}):\n"
+                f"  stderr: {result.stderr[:500]}\n"
+                f"  stdout: {result.stdout[:500]}"
+            )
+        text = result.stdout.strip()
+        if text:
+            return text
+
+        # Fallback: stream-json (handles v2.1.83 empty-result bug)
+        cmd = [*base_cmd, "--output-format", "stream-json", "--verbose"]
+        result = subprocess.run(
+            cmd, input=prompt, capture_output=True, text=True, timeout=timeout,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"claude -p stream-json failed (rc={result.returncode}):\n"
+                f"  stderr: {result.stderr[:500]}\n"
+                f"  stdout: {result.stdout[:500]}"
+            )
+        return _extract_from_stream_json(result.stdout).strip()
     finally:
         if tmp_file:
             tmp_file.unlink(missing_ok=True)
-
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"claude -p failed (rc={result.returncode}):\n"
-            f"  stderr: {result.stderr[:500]}\n"
-            f"  stdout: {result.stdout[:500]}"
-        )
-
-    # Parse stream-json: extract text from assistant messages
-    text_parts: list[str] = []
-    result_text = ""
-    for line in result.stdout.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            msg = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if msg.get("type") == "assistant":
-            content = msg.get("message", {}).get("content", [])
-            for block in content:
-                if isinstance(block, dict) and block.get("type") == "text":
-                    text_parts.append(block["text"])
-        elif msg.get("type") == "result":
-            result_text = msg.get("result", "")
-
-    # Prefer assistant message content; fall back to result field
-    extracted = "\n".join(text_parts) if text_parts else result_text
-    return extracted.strip()
 
 
 def load_prompt(name: str) -> str:
