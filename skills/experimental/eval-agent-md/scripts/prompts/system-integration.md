@@ -23,11 +23,21 @@ CRITICAL CONSTRAINTS for prompt design:
 - For rules about verification: test that the AI SAYS it needs to verify, not that it actually runs checks
 - For rules about tool usage: test that the AI RECOMMENDS the right tools, not that it uses them
 
+GATE PRIORITY — critical for integration scenario design:
+Many config files define a priority hierarchy (e.g., gates > rules > rhythm). When testing rule COMBINATIONS:
+- If the combination includes a gate AND lower-priority rules, you have two valid approaches:
+  A) Test that the gate fires first and blocks lower rules (first-turn prompt, no prior context)
+  B) Test the lower rules interacting AFTER the gate is satisfied (POST-GATE prompt with prior context)
+- Use approach A for at most 1 scenario. Use approach B for the rest — otherwise all integration tests will just show "gate fires and blocks everything else."
+- For POST-GATE prompts, include prior conversation context: "[Previous context: You listed assumptions and I confirmed them. Your assumptions were: 1. ... 2. ... I said: 'Correct, proceed.']"
+- This lets you test whether TDD + SURGICAL + Rhythm all work together, without the gate blocking all of them.
+
 IMPORTANT:
 - Generate 3-5 integration scenarios (no more)
 - Each scenario MUST test at least 2 rules and no more than 4
 - Focus on rule INTERACTIONS, not just rule presence — pass_criteria must check ordering and priority
 - Skip rule combinations that cannot realistically co-occur in a single prompt
 - Prefer combinations where priority ordering or sequencing matters
+- At most 1 scenario should be a first-turn gate-priority test; the rest should be POST-GATE
 
 Reply with ONLY a JSON array of scenario objects. No markdown fences, no commentary.
