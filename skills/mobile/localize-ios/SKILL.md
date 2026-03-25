@@ -9,7 +9,7 @@ description: 'Localizes UIKit Views and ViewControllers and SwiftUI Views. Extra
   Swift tasks unrelated to localization.'
 metadata:
   category: mobile
-  version: 1
+  version: 2
 ---
 
 # Localize Swift

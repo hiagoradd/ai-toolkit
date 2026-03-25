@@ -6,6 +6,7 @@ description: Draft scaffold; incomplete and not for normal use. TanStack Form pa
 metadata:
   category: frontend
   status: draft
+  version: 1
 ---
 
 # Status

@@ -6,6 +6,7 @@ description: Draft scaffold; incomplete and not for normal use. Prisma ORM schem
 metadata:
   category: database
   status: draft
+  version: 1
 ---
 
 # Status

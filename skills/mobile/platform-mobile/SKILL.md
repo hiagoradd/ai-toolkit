@@ -6,6 +6,7 @@ description: Draft scaffold; incomplete and not for normal use. Cross-platform m
 metadata:
   category: mobile
   status: draft
+  version: 1
 ---
 
 # Status

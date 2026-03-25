@@ -7,6 +7,7 @@ description: Draft scaffold; incomplete and not for normal use. iOS and Swift de
 metadata:
   category: mobile
   status: draft
+  version: 1
 ---
 
 # iOS Development Patterns

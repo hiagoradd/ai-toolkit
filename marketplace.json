@@ -48,7 +48,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 6,
-      "version": 3
+      "version": 4
     },
     {
       "name": "platform-backend",
@@ -64,7 +64,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 13,
-      "version": 3
+      "version": 4
     },
     {
       "name": "platform-database",
@@ -81,7 +81,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 19,
-      "version": 3
+      "version": 4
     },
     {
       "name": "platform-testing",
@@ -96,7 +96,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 3,
-      "version": 3
+      "version": 4
     },
     {
       "name": "platform-cli",
@@ -111,7 +111,7 @@
       ],
       "extends": "core-coding-standards",
       "status": "ready",
-      "version": 3
+      "version": 4
     },
     {
       "name": "tech-react",
@@ -128,7 +128,7 @@
       "extends": "platform-frontend",
       "status": "ready",
       "rules": 8,
-      "version": 3
+      "version": 4
     },
     {
       "name": "tech-trpc",
@@ -144,7 +144,7 @@
       "extends": "platform-backend",
       "status": "ready",
       "rules": 8,
-      "version": 3
+      "version": 4
     },
     {
       "name": "tech-drizzle",
@@ -160,7 +160,7 @@
       "extends": "platform-database",
       "status": "ready",
       "rules": 9,
-      "version": 3
+      "version": 4
     },
     {
       "name": "tech-vitest",
@@ -176,7 +176,7 @@
       "extends": "platform-testing",
       "status": "ready",
       "rules": 7,
-      "version": 3
+      "version": 4
     },
     {
       "name": "design-frontend",
@@ -192,7 +192,7 @@
       ],
       "status": "ready",
       "rules": 7,
-      "version": 3
+      "version": 4
     },
     {
       "name": "design-accessibility",
@@ -207,7 +207,7 @@
       ],
       "status": "ready",
       "rules": 4,
-      "version": 3
+      "version": 4
     },
     {
       "name": "figma-to-react-components",
@@ -225,7 +225,7 @@
       ],
       "status": "ready",
       "rules": 5,
-      "version": 2
+      "version": 3
     },
     {
       "name": "liquid-glass-ios",
@@ -240,7 +240,7 @@
         "design"
       ],
       "status": "ready",
-      "version": 3
+      "version": 4
     },
     {
       "name": "swift-concurrency",
@@ -255,7 +255,7 @@
         "ios"
       ],
       "status": "ready",
-      "version": 3
+      "version": 4
     },
     {
       "name": "promptify",
@@ -344,7 +344,7 @@
         "uikit"
       ],
       "status": "ready",
-      "version": 1
+      "version": 2
     },
     {
       "name": "tech-android",
@@ -361,7 +361,7 @@
       "extends": "platform-mobile",
       "status": "ready",
       "rules": 11,
-      "version": 4
+      "version": 5
     },
     {
       "name": "rewrite-commit-history",
@@ -437,7 +437,84 @@
         "quality"
       ],
       "status": "ready",
-      "version": 5
+      "version": 7
+    },
+    {
+      "name": "tech-prisma",
+      "source": "./skills/database/tech-prisma",
+      "description": "Draft scaffold; incomplete and not for normal use. Prisma ORM schema design and query patterns. Extends platform-database with Prisma-specific rules. Use when working with Prisma.",
+      "category": "database",
+      "tags": [
+
+      ],
+      "status": "draft",
+      "version": 1
+    },
+    {
+      "name": "tech-tanstack-form",
+      "source": "./skills/frontend/tech-tanstack-form",
+      "description": "Draft scaffold; incomplete and not for normal use. TanStack Form patterns for type-safe form management. Extends platform-frontend with form-specific rules. Use when building forms with TanStack Form.",
+      "category": "frontend",
+      "tags": [
+
+      ],
+      "status": "draft",
+      "version": 1
+    },
+    {
+      "name": "tech-tanstack-router",
+      "source": "./skills/frontend/tech-tanstack-router",
+      "description": "Draft scaffold; incomplete and not for normal use. TanStack Router patterns for type-safe routing. Extends platform-frontend with router-specific rules. Use when building with TanStack Router.",
+      "category": "frontend",
+      "tags": [
+
+      ],
+      "status": "draft",
+      "version": 1
+    },
+    {
+      "name": "design-mobile",
+      "source": "./skills/mobile/design-mobile",
+      "description": "Draft scaffold; incomplete and not for normal use. Mobile-specific visual design patterns — touch targets, gestures, and platform conventions. Use when designing mobile interfaces.",
+      "category": "mobile",
+      "tags": [
+
+      ],
+      "status": "draft",
+      "version": 1
+    },
+    {
+      "name": "platform-mobile",
+      "source": "./skills/mobile/platform-mobile",
+      "description": "Draft scaffold; incomplete and not for normal use. Cross-platform mobile development patterns. Extends core-coding-standards with mobile-specific rules. Use when building mobile apps.",
+      "category": "mobile",
+      "tags": [
+
+      ],
+      "status": "draft",
+      "version": 1
+    },
+    {
+      "name": "tech-ios",
+      "source": "./skills/mobile/tech-ios",
+      "description": "Draft scaffold; incomplete and not for normal use. iOS and Swift development patterns. Extends platform-mobile with iOS-specific rules. See swift-concurrency skill for async/await patterns and liquid-glass-ios skill for iOS 26+ UI design. Use for general iOS development guidance.",
+      "category": "mobile",
+      "tags": [
+
+      ],
+      "status": "draft",
+      "version": 1
+    },
+    {
+      "name": "tech-react-native",
+      "source": "./skills/mobile/tech-react-native",
+      "description": "Draft scaffold; incomplete and not for normal use. React Native development patterns. Extends platform-mobile and tech-react with React Native-specific rules. Use when building React Native apps.",
+      "category": "mobile",
+      "tags": [
+
+      ],
+      "status": "draft",
+      "version": 1
     }
   ],
   "drafts": [
@@ -535,5 +612,7 @@
       "extends": "design"
     }
   ],
-  "experimental": []
+  "experimental": [
+
+  ]
 }

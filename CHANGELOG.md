@@ -2,6 +2,7 @@
 
 ## 2026-03-25
 
+- Refactored flatten skill hierarchy from 6 tiers to 8 role-based dirs. (#18)
 - Added --holistic integration scenarios for multi-rule testing.
 ## 2026-03-23
 

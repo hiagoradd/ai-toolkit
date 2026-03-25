@@ -11,7 +11,7 @@ metadata:
   - security
   - server
   status: ready
-  version: 3
+  version: 4
 ---
 
 # Principles
