@@ -271,7 +271,7 @@
       ],
       "status": "ready",
       "rules": 11,
-      "version": 4
+      "version": 5
     },
     {
       "name": "agent-add-rule",

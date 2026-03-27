@@ -1,9 +1,9 @@
 ---
 name: promptify
 description: Transform user requests into detailed, precise prompts for AI models.
-  Use when users say 'promptify', 'promptify this', 'rewrite this prompt',
-  'make this prompt better/more specific', or explicitly request prompt engineering
-  or improvement of their request for better AI responses.
+  Use when users say 'promptify', 'promptify this', 'rewrite this prompt', 'make this
+  prompt better/more specific', or explicitly request prompt engineering or improvement
+  of their request for better AI responses.
 metadata:
   category: assistant
   tags:
@@ -13,18 +13,18 @@ metadata:
   - specification
   - rewriting
   status: ready
-  version: 4
+  version: 5
   triggers:
     positive:
-      - "Promptify this: audit all skills against our findings doc."
-      - "Rewrite this prompt for better results."
-      - "Make this prompt more specific."
-      - "Can you improve this prompt?"
+    - 'Promptify this: audit all skills against our findings doc.'
+    - Rewrite this prompt for better results.
+    - Make this prompt more specific.
+    - Can you improve this prompt?
     negative:
-      - "Generate mock customer data in JSON format."
-      - "Write a React component for a login form."
-      - "Fix the bug in the checkout flow."
-  guidance: |
+    - Generate mock customer data in JSON format.
+    - Write a React component for a login form.
+    - Fix the bug in the checkout flow.
+  guidance: |-
     `promptify` transforms user requests into precise, structured prompts.
     Only activate when the user explicitly requests prompt improvement or rewriting.
     Do not activate for direct task execution requests.
