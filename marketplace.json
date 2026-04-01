@@ -530,6 +530,23 @@
       ],
       "status": "draft",
       "version": 1
+    },
+    {
+      "name": "ts-linter",
+      "source": "skills/universal/ts-linter",
+      "description": "Set up and enforce a strict, production-grade ESLint configuration for TypeScript projects, then systematically fix all linting issues.",
+      "category": "universal",
+      "tags": [
+        "eslint",
+        "typescript",
+        "linting",
+        "code-quality",
+        "static-analysis"
+      ],
+      "extends": "core-coding-standards",
+      "status": "ready",
+      "rules": 0,
+      "version": 1
     }
   ],
   "drafts": [
