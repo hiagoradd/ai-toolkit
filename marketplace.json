@@ -532,6 +532,21 @@
       "version": 1
     },
     {
+      "name": "parallel",
+      "source": "skills/assistant/parallel",
+      "description": "Run a task in a background sub-agent so you can continue working on other things.",
+      "category": "assistant",
+      "tags": [
+        "agent",
+        "parallel",
+        "background",
+        "sub-agent",
+        "workflow"
+      ],
+      "status": "ready",
+      "version": 1
+    },
+    {
       "name": "ts-linter",
       "source": "skills/universal/ts-linter",
       "description": "Set up and enforce a strict, production-grade ESLint configuration for TypeScript projects, then systematically fix all linting issues.",

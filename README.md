@@ -2,7 +2,7 @@
 
 [![Skills Quality](https://github.com/ravnhq/ai-toolkit/actions/workflows/skills-quality.yml/badge.svg)](https://github.com/ravnhq/ai-toolkit/actions/workflows/skills-quality.yml)
 
-Modular "skills" — portable rule packs that teach AI coding agents (Claude Code, Cursor, etc.) best practices for specific technologies — so every project gets consistent, expert-level guidance without copy-pasting prompts. **28 ready skills** organized by role.
+Modular "skills" — portable rule packs that teach AI coding agents (Claude Code, Cursor, etc.) best practices for specific technologies — so every project gets consistent, expert-level guidance without copy-pasting prompts. **29 ready skills** organized by role.
 
 ## Quick Start
 
@@ -127,6 +127,7 @@ npx skills add ravnhq/ai-toolkit -s platform-testing
 | `agent-pr-creator` | Analyzes git diffs and commit history to create pull requests via gh CLI. |
 | `rewrite-commit-history` | Rewrite a feature branch's commit history into clean conventional commits. |
 | `eval-agent-md` | Behavioral compliance testing for CLAUDE.md or agent definition files. |
+| `parallel` | Run a task in a background sub-agent so you can continue working on other things. |
 
 ## Versioning
 
