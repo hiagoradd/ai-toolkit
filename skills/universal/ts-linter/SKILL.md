@@ -114,7 +114,7 @@ Generate `eslint.config.mjs` using only the sections relevant to the detected pr
 Every config MUST include these core sections (framework-agnostic):
 
 - Global ignores
-- `eslint-plugin-only-error` (all warnings become errors)
+- `--max-warnings=0` CLI flag (treats any warning as a CI failure)
 - `@eslint/js` recommended + `typescript-eslint` recommendedTypeChecked
 - `eslint-plugin-de-morgan`, `unicorn`, `promise`, `security`, `sonarjs`, `regexp`
 - `@eslint-community/eslint-plugin-eslint-comments`
@@ -164,13 +164,13 @@ If the script is unavailable, install manually. Core packages (always needed):
 
 ```
 eslint @eslint/js typescript-eslint globals eslint-config-prettier
-eslint-plugin-only-error eslint-plugin-de-morgan eslint-plugin-unicorn
+eslint-plugin-de-morgan eslint-plugin-unicorn
 eslint-plugin-promise eslint-plugin-security eslint-plugin-sonarjs
 eslint-plugin-regexp @eslint-community/eslint-plugin-eslint-comments
 ```
 
 Conditional packages: `eslint-plugin-react` + `eslint-plugin-react-hooks` +
-`eslint-plugin-react-you-might-not-need-an-effect` (React), `eslint-plugin-react-native`
+`eslint-plugin-react-you-might-not-need-an-effect` (React), `@react-native/eslint-config`
 (RN), `@tanstack/eslint-plugin-query` (TanStack), `eslint-plugin-drizzle` (Drizzle),
 `eslint-plugin-n` (Node), `@vitest/eslint-plugin` (Vitest), `eslint-plugin-playwright`
 (Playwright), `eslint-plugin-testing-library` (Testing Library).
@@ -239,12 +239,26 @@ lowest-risk first):
 7. **Max-lines** — split files over 300 lines. Update all affected imports.
 8. **React-specific** — extract nested/multi components into separate files.
 
+### Documentation Lookup
+
+Before attempting a manual fix, determine whether research is needed:
+
+- **Skip lookup** for trivial fixes: unused imports, missing return types, simple renames.
+- **Do lookup** when: the rule is unfamiliar, the fix requires a deprecated API replacement, the correct type narrowing is unclear, or the refactor pattern is non-obvious.
+
+Lookup fallback chain (use the first that succeeds):
+
+1. **Rule URL from linter output** — ESLint errors include a docs link. Read it.
+2. **Documentation tools** — if MCP doc providers (Context7, etc.) or `/context7` are available, query them for the relevant library/API.
+3. **Web search** — search for the rule name + "TypeScript" + the specific pattern.
+4. **Flag to user** — if no source clarifies the fix, report the rule and ask before guessing.
+
 ### Fix Principles
 
 - **Rules are immutable.** Do not add `eslint-disable`, `eslint-disable-next-line`, `@ts-ignore`, `@ts-expect-error`, or modify `eslint.config.mjs` to weaken a rule.
 - **Fix the code, not the rule.** If a rule flags `any`, replace with a proper type — do not cast through `unknown` as a shortcut. If a rule flags cognitive complexity, extract named helpers.
 - **Behavior must be preserved.** Every refactor must produce identical runtime behavior. Flag public API signature changes to the user before applying.
-- **Read the rule docs.** Before fixing a violation, understand what the rule enforces and why. Propose the minimal refactor that satisfies it.
+- **Research before refactoring.** Follow the Documentation Lookup chain above — understand what the rule enforces and why before proposing a fix.
 - Check `tsc --noEmit` and tests after every batch of fixes.
 - Fix in batches of 5 files max, then verify. If tests break, revert and redo one at a time.
 - Never rename files and fix lint in the same batch — renames touch every import site.

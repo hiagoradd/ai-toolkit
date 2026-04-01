@@ -1,17 +1,17 @@
 import eslintComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import eslint from "@eslint/js";
+import { defineConfig } from "eslint/config";
 import tanstackQuery from "@tanstack/eslint-plugin-query";
+import reactNativeConfig from "@react-native/eslint-config/flat";
 import vitestPlugin from "@vitest/eslint-plugin";
 import prettierConfig from "eslint-config-prettier";
 import deMorgan from "eslint-plugin-de-morgan";
 import drizzle from "eslint-plugin-drizzle";
 import nodePlugin from "eslint-plugin-n";
-import onlyError from "eslint-plugin-only-error";
 import playwrightPlugin from "eslint-plugin-playwright";
 import promisePlugin from "eslint-plugin-promise";
 import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
-import reactNativePlugin from "eslint-plugin-react-native";
 import reactYouMightNotNeedAnEffect from "eslint-plugin-react-you-might-not-need-an-effect";
 import regexpPlugin from "eslint-plugin-regexp";
 import securityPlugin from "eslint-plugin-security";
@@ -21,8 +21,7 @@ import unicorn from "eslint-plugin-unicorn";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-// eslint-disable-next-line @typescript-eslint/no-deprecated -- tseslint.config is still supported, defineConfig is opt-in
-export default tseslint.config(
+export default defineConfig(
 	// ============================================================
 	// 🚫 GLOBAL IGNORES
 	// Common build/output directories. Add your own as needed.
@@ -47,13 +46,9 @@ export default tseslint.config(
 	// ============================================================
 	// ⛔ TREAT ALL WARNINGS AS ERRORS
 	// Keeps CI clean — no "warning debt" piling up.
-	// 📦 eslint-plugin-only-error
+	// Run ESLint with: eslint . --max-warnings=0
+	// This treats any warning as a CI failure — no plugin needed.
 	// ============================================================
-	{
-		plugins: {
-			"only-error": onlyError,
-		},
-	},
 
 	// ============================================================
 	// ✅ CORE: Language & Code Quality (everyone keeps this)
@@ -61,7 +56,7 @@ export default tseslint.config(
 	// These are framework-agnostic and apply to any TS/JS project.
 	// 📦 @eslint/js, typescript-eslint, eslint-plugin-unicorn,
 	//    eslint-plugin-de-morgan, eslint-plugin-promise,
-	//    eslint-plugin-security, eslint-plugin-sonarjs,
+	//    eslint-plugin-security, eslint-plugin-sonarjs (v4+, SSALv1 license),
 	//    eslint-plugin-regexp, @eslint-community/eslint-plugin-eslint-comments
 	// ============================================================
 	eslint.configs.recommended,
@@ -72,6 +67,7 @@ export default tseslint.config(
 	securityPlugin.configs.recommended,
 	sonarjs.configs.recommended,
 	regexpPlugin.configs["flat/recommended"],
+	// Note: eslint-comments/no-unused-disable is deprecated in v4.7+
 	eslintComments.recommended,
 
 	// ============================================================
@@ -100,17 +96,14 @@ export default tseslint.config(
 	// ⚛️ REACT (Web + Native shared)
 	//
 	// REMOVE this entire section if you don't use React.
-	// 📦 eslint-plugin-react, eslint-plugin-react-hooks,
+	// 📦 eslint-plugin-react, eslint-plugin-react-hooks (v7+),
 	//    eslint-plugin-react-you-might-not-need-an-effect
 	// ============================================================
 	reactPlugin.configs.flat.recommended,
 	reactPlugin.configs.flat["jsx-runtime"],
+	reactHooksPlugin.configs.flat.recommended,
 	{
-		plugins: {
-			"react-hooks": reactHooksPlugin,
-		},
 		rules: {
-			...reactHooksPlugin.configs.recommended.rules,
 			// Disabled — using react/no-unstable-nested-components instead (faster)
 			"react-hooks/static-components": "off",
 		},
@@ -295,7 +288,8 @@ export default tseslint.config(
 		},
 		settings: {
 			n: {
-				version: ">=22.0.0",
+				// ESLint v10 requires Node ^20.19.0 || ^22.13.0 || >=24
+				version: ">=22.13.0",
 			},
 		},
 		rules: {
@@ -318,7 +312,7 @@ export default tseslint.config(
 	// 📱 REACT NATIVE
 	//
 	// REMOVE this entire section if you don't have a native app.
-	// 📦 eslint-plugin-react-native
+	// 📦 @react-native/eslint-config (official, replaces eslint-plugin-react-native)
 	// ============================================================
 	{
 		files: [
@@ -326,9 +320,7 @@ export default tseslint.config(
 			"**/native/**/*.tsx",
 			"**/native/**/*.ts",
 		],
-		plugins: {
-			"react-native": reactNativePlugin,
-		},
+		...reactNativeConfig,
 		languageOptions: {
 			globals: {
 				...globals.browser,
@@ -336,7 +328,6 @@ export default tseslint.config(
 			},
 		},
 		rules: {
-			...reactNativePlugin.configs.all.rules,
 			// Allow inline styles (e.g. with NativeWind / Tailwind)
 			"react-native/no-inline-styles": "off",
 			// Colors handled by styling framework (NativeWind, etc.)

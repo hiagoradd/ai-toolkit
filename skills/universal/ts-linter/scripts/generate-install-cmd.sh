@@ -31,7 +31,6 @@ CORE_PKGS=(
   "typescript-eslint"
   "@eslint-community/eslint-plugin-eslint-comments"
   "eslint-plugin-de-morgan"
-  "eslint-plugin-only-error"
   "eslint-plugin-promise"
   "eslint-plugin-regexp"
   "eslint-plugin-security"
@@ -59,7 +58,7 @@ if [[ "$REACT" == "true" ]]; then
 fi
 
 if [[ "$REACT_NATIVE" == "true" ]]; then
-  NATIVE_PKGS=("eslint-plugin-react-native")
+  NATIVE_PKGS=("@react-native/eslint-config")
 fi
 
 if [[ "$TANSTACK" == "true" ]]; then

@@ -57,7 +57,7 @@ else
 fi
 
 # Check core ESLint packages
-core_pkgs=("eslint" "typescript-eslint" "eslint-plugin-unicorn" "eslint-plugin-sonarjs" "eslint-plugin-only-error")
+core_pkgs=("eslint" "typescript-eslint" "eslint-plugin-unicorn" "eslint-plugin-sonarjs")
 for pkg in "${core_pkgs[@]}"; do
   if [[ -d "node_modules/$pkg" ]]; then
     pass "$pkg installed"
