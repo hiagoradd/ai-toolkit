@@ -43,6 +43,55 @@ jobs:
       - name: Run trigger/functional/performance harness
         run: ruby scripts/skills_harness.rb
 
+  hygiene:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: No tracked .DS_Store files
+        run: |
+          if git ls-files '*.DS_Store' | grep -q .; then
+            echo "::error::Tracked .DS_Store files found — remove them and add to .gitignore"
+            git ls-files '*.DS_Store'
+            exit 1
+          fi
+
+      - name: No ./ path prefixes in marketplace.json
+        run: |
+          if grep -q '"source": "\\./' marketplace.json; then
+            echo "::error::marketplace.json contains ./ path prefixes — use relative paths without ./"
+            grep '"source": "\\./' marketplace.json
+            exit 1
+          fi
+
+      - name: No empty tags in marketplace.json
+        run: |
+          python3 -c "
+          import json, sys
+          data = json.load(open('marketplace.json'))
+          bad = [s['name'] for s in data['skills'] if not s.get('tags')]
+          if bad:
+              print(f'::error::Skills with empty tags: {bad}')
+              sys.exit(1)
+          "
+
+      - name: Required .gitignore patterns
+        run: |
+          REQUIRED=(".DS_Store" "tmp/" ".mypy_cache/" ".ruff_cache/" ".pytest_cache/")
+          MISSING=()
+          for pattern in "${REQUIRED[@]}"; do
+            if ! grep -qF "$pattern" .gitignore; then
+              MISSING+=("$pattern")
+            fi
+          done
+          if [ ${#MISSING[@]} -gt 0 ]; then
+            echo "::error::Missing .gitignore patterns: ${MISSING[*]}"
+            exit 1
+          fi
+
   shellcheck:
     runs-on: ubuntu-latest
     timeout-minutes: 5
