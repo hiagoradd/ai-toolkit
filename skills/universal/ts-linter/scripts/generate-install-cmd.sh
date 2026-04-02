@@ -134,9 +134,9 @@ echo "# Total packages: ${#ALL_PKGS[@]}"
 echo "#"
 echo "# Categories included:"
 echo "#   Core: ${#CORE_PKGS[@]} packages"
-[[ ${#REACT_PKGS[@]} -gt 0 ]] && echo "#   React: ${#REACT_PKGS[@]} packages" || true
-[[ ${#NATIVE_PKGS[@]} -gt 0 ]] && echo "#   React Native: ${#NATIVE_PKGS[@]} packages" || true
-[[ ${#QUERY_PKGS[@]} -gt 0 ]] && echo "#   TanStack Query: ${#QUERY_PKGS[@]} packages" || true
-[[ ${#DRIZZLE_PKGS[@]} -gt 0 ]] && echo "#   Drizzle ORM: ${#DRIZZLE_PKGS[@]} packages" || true
-[[ ${#TEST_PKGS[@]} -gt 0 ]] && echo "#   Testing: ${#TEST_PKGS[@]} packages" || true
-[[ ${#NODE_PKGS[@]} -gt 0 ]] && echo "#   Node.js: ${#NODE_PKGS[@]} packages" || true
+if [[ ${#REACT_PKGS[@]} -gt 0 ]]; then echo "#   React: ${#REACT_PKGS[@]} packages"; fi
+if [[ ${#NATIVE_PKGS[@]} -gt 0 ]]; then echo "#   React Native: ${#NATIVE_PKGS[@]} packages"; fi
+if [[ ${#QUERY_PKGS[@]} -gt 0 ]]; then echo "#   TanStack Query: ${#QUERY_PKGS[@]} packages"; fi
+if [[ ${#DRIZZLE_PKGS[@]} -gt 0 ]]; then echo "#   Drizzle ORM: ${#DRIZZLE_PKGS[@]} packages"; fi
+if [[ ${#TEST_PKGS[@]} -gt 0 ]]; then echo "#   Testing: ${#TEST_PKGS[@]} packages"; fi
+if [[ ${#NODE_PKGS[@]} -gt 0 ]]; then echo "#   Node.js: ${#NODE_PKGS[@]} packages"; fi

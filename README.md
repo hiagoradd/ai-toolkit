@@ -194,4 +194,3 @@ Tips, guides, and deep dives on AI-assisted development — visit the [Ravn AI T
 - Top 10 Claude Code Tips for Newcomers
 - Making Claude Code Yours
 - Context Switching Done Right
-
