@@ -2,6 +2,14 @@
 name: platform-database
 description: SQL database design, query optimization, and migration safety. Use when
   writing queries, designing schemas, or planning database migrations.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: database
   extends: core-coding-standards
@@ -12,7 +20,7 @@ metadata:
   - migrations
   - performance
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Principles

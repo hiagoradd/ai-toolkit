@@ -4,6 +4,14 @@ description: Reads open review comments from a GitHub PR, triages them, applies 
   fixes, and drafts reply messages. Use when user wants to address PR comments, says
   'address review comments', 'fix PR feedback', 'handle PR comments', 'respond to
   review', or mentions addressing code review feedback on a pull request.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: assistant
   tags:
@@ -15,7 +23,7 @@ metadata:
   - automation
   - gh-cli
   status: ready
-  version: 2
+  version: 3
 ---
 
 Address review comments on the following PR: $ARGUMENTS

@@ -3,6 +3,14 @@ name: swift-concurrency
 description: Swift Concurrency patterns — async/await, actors, tasks, Sendable conformance.
   Use when writing async/await code, implementing actors, working with structured
   concurrency, or ensuring data race safety.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: mobile
   tags:
@@ -12,7 +20,7 @@ metadata:
   - actors
   - ios
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Swift Concurrency Patterns

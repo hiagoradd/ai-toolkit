@@ -2,6 +2,14 @@
 name: tech-react
 description: React-specific component, hook, and rendering patterns. Use when writing
   React components, hooks, JSX, or optimizing React performance.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: frontend
   extends: platform-frontend
@@ -12,7 +20,7 @@ metadata:
   - jsx
   - web
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Rules

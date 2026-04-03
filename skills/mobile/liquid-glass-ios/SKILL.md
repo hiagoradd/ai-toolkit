@@ -3,6 +3,14 @@ name: liquid-glass-ios
 description: Apple's Liquid Glass design system for iOS 26+ and iPadOS 26+. Use when
   building iOS 26+ UI with glassEffect, implementing GlassEffectContainer, working
   with glass morphing transitions, or migrating from UIKit to SwiftUI glass APIs.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: mobile
   tags:
@@ -12,7 +20,7 @@ metadata:
   - swiftui
   - design
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Liquid Glass Design for iOS

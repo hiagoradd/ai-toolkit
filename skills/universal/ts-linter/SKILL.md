@@ -14,6 +14,14 @@ description: 'Set up and enforce a strict, production-grade ESLint configuration
   configuration.
 
   '
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: universal
   extends: core-coding-standards
@@ -24,7 +32,7 @@ metadata:
   - code-quality
   - static-analysis
   status: ready
-  version: 7
+  version: 8
 ---
 
 # TypeScript Linter Skill

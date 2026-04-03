@@ -4,6 +4,14 @@ description: Analyzes git diffs and commit history to intelligently fill PR temp
   and create pull requests via gh CLI. Use when user wants to create a PR, needs PR
   description help, or says 'create a pull request', 'fill PR template', 'make a PR',
   'open a pull request', or mentions PR creation.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: assistant
   tags:
@@ -14,7 +22,7 @@ metadata:
   - automation
   - gh-cli
   status: ready
-  version: 1
+  version: 2
 ---
 
 You are a PR creation assistant. Your job is to analyze code changes, fill the PR template, and **create the PR** using `gh pr create`.

@@ -3,6 +3,14 @@ name: tech-drizzle
 description: Drizzle ORM schema design, relational queries, and migration patterns.
   Use when working with Drizzle ORM, writing database queries, or managing Drizzle
   migrations.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: database
   extends: platform-database
@@ -12,7 +20,7 @@ metadata:
   - database
   - web
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Rules

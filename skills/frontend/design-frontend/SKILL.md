@@ -3,6 +3,14 @@ name: design-frontend
 description: Visual design system patterns for web UIs — layout, responsive, Tailwind
   tokens. Use when implementing visual designs, working with CSS/Tailwind, or building
   responsive layouts.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: frontend
   tags:
@@ -12,7 +20,7 @@ metadata:
   - responsive
   - web
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Rules

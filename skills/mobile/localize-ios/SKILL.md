@@ -7,9 +7,17 @@ description: 'Localizes UIKit Views and ViewControllers and SwiftUI Views. Extra
   (3) adding xcstrings entries. Triggers on: localize, extract strings, add localization,
   make localizable, xcstrings, localize this view, localize this file. NOT for general
   Swift tasks unrelated to localization.'
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: mobile
-  version: 2
+  version: 3
 ---
 
 # Localize Swift

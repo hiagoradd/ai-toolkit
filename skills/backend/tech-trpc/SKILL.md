@@ -3,6 +3,14 @@ name: tech-trpc
 description: tRPC router architecture, procedure design, and Vertical Slice Architecture
   patterns. Use when building tRPC APIs, designing procedures, or structuring backend
   slices.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: backend
   extends: platform-backend
@@ -12,7 +20,7 @@ metadata:
   - rpc
   - web
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Rules

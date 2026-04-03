@@ -7,6 +7,14 @@ description: 'Behavioral compliance testing for any CLAUDE.md or agent definitio
   your CLAUDE.md rules are actually followed, (2) evaluating an agent definition for
   role-boundary compliance, (3) dogfooding a skill''s own SKILL.md. Triggers on: "eval",
   "compliance test", "test my CLAUDE.md", "check rules", "behavioral test", "/eval-agent-md".'
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: assistant
   tags:
@@ -17,7 +25,7 @@ metadata:
   - meta
   - quality
   status: ready
-  version: 7
+  version: 8
 ---
 
 # eval-agent-md — Behavioral Compliance Testing

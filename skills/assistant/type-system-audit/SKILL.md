@@ -5,6 +5,14 @@ description: 'Audit a repository for type-system weaknesses using recent bug-fix
   Use when: reviewing type safety, auditing types, analyzing type bugs. Triggers on:
   "type audit", "type system review", "audit types", "type safety audit", "type-system
   audit".'
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: assistant
   tags:
@@ -13,7 +21,7 @@ metadata:
   - static-analysis
   - code-quality
   status: ready
-  version: 3
+  version: 4
 ---
 
 # Type-System Audit: Commit-First, Not Theory-First

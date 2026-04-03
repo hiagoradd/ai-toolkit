@@ -2,6 +2,14 @@
 name: platform-testing
 description: Framework-agnostic testing principles — test philosophy, structure, mocking
   boundaries. Use when writing, reviewing, or debugging tests.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: testing
   extends: core-coding-standards
@@ -10,7 +18,7 @@ metadata:
   - mocking
   - test-design
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Principles

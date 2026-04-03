@@ -138,6 +138,17 @@ def check_metadata(path, frontmatter, issues)
   end
 end
 
+def check_allowed_tools(path, frontmatter, issues)
+  status = frontmatter.dig("metadata", "status")
+  active = path.include?("/skills/") && status != "scaffold" && status != "draft"
+  return unless active
+
+  unless frontmatter.key?("allowed-tools")
+    issues << Issue.new(severity: :warn, code: "missing_allowed_tools", path:,
+      message: "Active skills should declare `allowed-tools` for CLI manifest compliance.")
+  end
+end
+
 def check_structure(path, body, frontmatter, issues)
   status = frontmatter.dig("metadata", "status")
   active = path.include?("/skills/") && status != "scaffold" && status != "draft"
@@ -256,6 +267,7 @@ SKILL_FILES.each do |path|
   frontmatter, body = parse_skill(path, issues)
   check_frontmatter(path, frontmatter, issues)
   check_metadata(path, frontmatter, issues)
+  check_allowed_tools(path, frontmatter, issues)
   check_structure(path, body, frontmatter, issues)
   check_links(path, body, issues)
 

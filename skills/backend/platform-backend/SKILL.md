@@ -2,6 +2,14 @@
 name: platform-backend
 description: Server-side architecture and security — API design, error handling, validation,
   logging. Use when building APIs, server logic, or reviewing backend security.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: backend
   extends: core-coding-standards
@@ -11,7 +19,7 @@ metadata:
   - security
   - server
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Principles

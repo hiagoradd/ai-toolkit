@@ -2,6 +2,14 @@
 name: tech-vitest
 description: Vitest-specific testing utilities — vi.mock, vi.fn, fake timers, MSW.
   Use when writing tests with Vitest, mocking dependencies, or setting up test infrastructure.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: testing
   extends: platform-testing
@@ -11,7 +19,7 @@ metadata:
   - mocking
   - web
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Rules
