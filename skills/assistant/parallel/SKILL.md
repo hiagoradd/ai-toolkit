@@ -3,8 +3,8 @@ name: parallel
 description: Run a task in a background sub-agent so you can continue working on other
   things. Use when explicitly invoked via the '/parallel' slash command. Never auto-triggers
   from natural language.
-disable-model-invocation: true
 metadata:
+  disable-model-invocation: true
   category: assistant
   tags:
   - agent
