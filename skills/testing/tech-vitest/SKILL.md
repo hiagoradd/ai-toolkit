@@ -27,7 +27,7 @@ metadata:
   - msw
   - snapshot
   status: ready
-  version: 5
+  version: 6
 ---
 
 # Vitest Testing Framework

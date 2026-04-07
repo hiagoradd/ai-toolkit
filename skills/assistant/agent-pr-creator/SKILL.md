@@ -22,7 +22,7 @@ metadata:
   - automation
   - gh-cli
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Agent PR Creator

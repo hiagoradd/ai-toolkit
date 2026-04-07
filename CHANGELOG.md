@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-04-07
+
+- Added rewrite barebones skills with structured rules and best practices. (#24)
 ## 2026-04-02
 
 - Improved Turborepo support — pnpm -w flag, turbo typecheck, tsconfig guidance.

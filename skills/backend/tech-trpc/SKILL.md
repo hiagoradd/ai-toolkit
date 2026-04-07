@@ -26,7 +26,7 @@ metadata:
   - error-handling
   - validation
   status: ready
-  version: 5
+  version: 6
 ---
 
 # tRPC End-to-End Typesafe APIs

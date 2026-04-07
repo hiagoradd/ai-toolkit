@@ -25,7 +25,7 @@ metadata:
   - swiftui
   - uikit
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Localize Swift

@@ -21,7 +21,7 @@ metadata:
   - static-analysis
   - code-quality
   status: ready
-  version: 6
+  version: 7
 ---
 
 # Type-System Audit

@@ -25,7 +25,7 @@ metadata:
   - dark-mode
   - container-queries
   status: ready
-  version: 5
+  version: 6
 ---
 
 # Visual Design Systems for Web UIs

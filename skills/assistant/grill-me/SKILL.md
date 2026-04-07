@@ -21,7 +21,7 @@ metadata:
   - decision-making
   - validation
   status: ready
-  version: 5
+  version: 6
 ---
 
 # Grill Me

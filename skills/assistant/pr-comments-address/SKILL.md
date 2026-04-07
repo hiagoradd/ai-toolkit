@@ -23,7 +23,7 @@ metadata:
   - automation
   - gh-cli
   status: ready
-  version: 5
+  version: 6
 ---
 
 # PR Comments Address

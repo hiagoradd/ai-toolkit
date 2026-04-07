@@ -1,6 +1,9 @@
 ---
 name: tech-react
-description: React 19 patterns for components, hooks, Server Components, and data fetching. Use when writing React components, managing state with hooks, implementing Suspense boundaries, optimizing renders with proper memoization, or building Server/Client component hierarchies.
+description: React 19 patterns for components, hooks, Server Components, and data
+  fetching. Use when writing React components, managing state with hooks, implementing
+  Suspense boundaries, optimizing renders with proper memoization, or building Server/Client
+  component hierarchies.
 allowed-tools:
 - Bash
 - Read
@@ -22,7 +25,7 @@ metadata:
   - use-hook
   - web
   status: ready
-  version: 6
+  version: 7
 ---
 
 # Core Challenges

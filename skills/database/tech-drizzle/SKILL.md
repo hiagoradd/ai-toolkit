@@ -24,7 +24,7 @@ metadata:
   - query
   - performance
   status: ready
-  version: 5
+  version: 6
 ---
 
 # Drizzle ORM TypeSafe Database Access
