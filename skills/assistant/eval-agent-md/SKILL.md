@@ -27,9 +27,9 @@ metadata:
   - meta
   - quality
   status: ready
-  version: 11
+  version: 12
 compatibility:
-  - claude-code
+- claude-code
 ---
 
 # eval-agent-md — Behavioral Compliance Testing
