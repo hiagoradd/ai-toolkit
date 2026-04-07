@@ -30,6 +30,8 @@ ruby scripts/markdown_lint.rb                    # Lint markdown in skill files
 bash scripts/changelog.sh                        # Generate changelog
 ```
 
+Before pushing, run `ruby scripts/markdown_lint.rb` — CI will reject markdown lint failures.
+
 Releases happen automatically via CI on merge to main. For manual releases outside the PR flow: `bash scripts/release.sh <skill-name>`
 
 ## Skill Architecture
@@ -82,9 +84,9 @@ Skills can declare `extends: <parent-skill-name>` in frontmatter to inherit rule
 
 Every rule MUST have:
 - YAML frontmatter: `title`, `impact` (CRITICAL/HIGH/MEDIUM/LOW), `tags`
-- **Incorrect** code example with explanation
-- **Correct** code example with explanation
-- **Why it matters** section explaining consequences
+- **Incorrect** code example with explanation (bold label: `**Incorrect (context):**`, not an H2 heading)
+- **Correct** code example with explanation (bold label: `**Correct (context):**`)
+- **Why it matters** section explaining consequences (bold label: `**Why it matters:**`)
 
 ### Rule Organization
 
