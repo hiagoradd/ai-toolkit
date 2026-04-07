@@ -1,13 +1,11 @@
 # Claude Code Integration
 
-After the linter is set up and passing, offer to install Claude Code hooks and the TypeScript
-LSP plugin. This ensures Claude Code automatically lints and type-checks every file it edits,
+After the linter is set up and passing, install Claude Code hooks and the TypeScript LSP
+plugin automatically. Do not ask for permission — this step runs whenever Claude Code is
+detected. This ensures Claude Code automatically lints and type-checks every file it edits,
 creating a self-correcting loop where errors are caught and fixed before Claude finishes.
 
-Ask the user: "Want me to set up Claude Code hooks so the linter and type checker run
-automatically after every edit?"
-
-If yes, proceed with all substeps below.
+Proceed with all substeps below.
 
 ## Install the TypeScript LSP Plugin
 
@@ -42,7 +40,7 @@ values directly:
 bash <skill-path>/scripts/detect-project.sh . | node -e "
   let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{
     const o=JSON.parse(d);
-    console.log('LINT_CMD:', o.detectedCommands.lint || 'npx eslint . --quiet');
+    console.log('LINT_CMD:', o.detectedCommands.lint || 'npx eslint . --max-warnings=0');
     console.log('TSC_CMD:', o.detectedCommands.typecheck || 'npx tsc --noEmit');
     console.log('TEST_CMD:', o.detectedCommands.test || '(none)');
   });
@@ -59,8 +57,8 @@ Map what you find:
 
 | `package.json` script | Hook variable | Fallback |
 |---|---|---|
-| `"lint"` or `"lint:check"` | `LINT_CMD` | `npx eslint` |
-| `"typecheck"` or `"type-check"` or `"tsc"` | `TSC_CMD` | `npx tsc --noEmit` |
+| `"lint"` or `"lint:check"` | `LINT_CMD` | `npx eslint` (or `pnpm exec eslint` for pnpm) |
+| `"typecheck"` or `"type-check"` or `"tsc"` | `TSC_CMD` | `npx tsc --noEmit` (or `pnpm exec tsc --noEmit`) |
 | `"test"` or `"test:unit"` | `TEST_CMD` | (skip if absent) |
 
 Common patterns to detect:
@@ -129,7 +127,7 @@ Replace `<LINT_CMD>` and `<TSC_CMD>` with the actual detected commands. Examples
   `"command": "npm run lint 2>&1 | head -50 && npm run typecheck 2>&1 | head -50"`
 
 - Nothing detected (fallback):
-  `"command": "npx eslint . --quiet 2>&1 | head -30 && npx tsc --noEmit 2>&1 | head -30"`
+  `"command": "npx eslint . --max-warnings=0 2>&1 | head -30 && npx tsc --noEmit 2>&1 | head -30"`
 
 If `.claude/settings.json` already exists, merge the `hooks` key into it. Do not overwrite
 existing settings.

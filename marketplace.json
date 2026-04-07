@@ -17,11 +17,11 @@
       ],
       "status": "ready",
       "rules": 2,
-      "version": 3
+      "version": 4
     },
     {
       "name": "grill-me",
-      "source": "./skills/assistant/grill-me",
+      "source": "skills/assistant/grill-me",
       "description": "Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree.",
       "category": "assistant",
       "tags": [
@@ -31,7 +31,7 @@
         "decision-making"
       ],
       "status": "ready",
-      "version": 2
+      "version": 6
     },
     {
       "name": "lang-typescript",
@@ -46,7 +46,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 4,
-      "version": 3
+      "version": 4
     },
     {
       "name": "platform-frontend",
@@ -62,7 +62,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 6,
-      "version": 4
+      "version": 5
     },
     {
       "name": "platform-backend",
@@ -78,7 +78,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 13,
-      "version": 4
+      "version": 5
     },
     {
       "name": "platform-database",
@@ -95,7 +95,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 19,
-      "version": 4
+      "version": 5
     },
     {
       "name": "platform-testing",
@@ -110,7 +110,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 3,
-      "version": 4
+      "version": 5
     },
     {
       "name": "platform-cli",
@@ -125,24 +125,27 @@
       ],
       "extends": "core-coding-standards",
       "status": "ready",
-      "version": 4
+      "version": 5
     },
     {
       "name": "tech-react",
       "source": "skills/frontend/tech-react",
-      "description": "React-specific component, hook, and rendering patterns.",
+      "description": "React 19 patterns for components, hooks, Server Components, and data fetching with Suspense.",
       "category": "frontend",
       "tags": [
         "react",
         "hooks",
         "components",
         "jsx",
+        "server-components",
+        "suspense",
+        "use-hook",
         "web"
       ],
       "extends": "platform-frontend",
       "status": "ready",
-      "rules": 8,
-      "version": 4
+      "rules": 11,
+      "version": 7
     },
     {
       "name": "tech-trpc",
@@ -158,7 +161,7 @@
       "extends": "platform-backend",
       "status": "ready",
       "rules": 8,
-      "version": 4
+      "version": 6
     },
     {
       "name": "tech-drizzle",
@@ -174,7 +177,7 @@
       "extends": "platform-database",
       "status": "ready",
       "rules": 9,
-      "version": 4
+      "version": 6
     },
     {
       "name": "tech-vitest",
@@ -190,7 +193,7 @@
       "extends": "platform-testing",
       "status": "ready",
       "rules": 7,
-      "version": 4
+      "version": 6
     },
     {
       "name": "design-frontend",
@@ -206,7 +209,7 @@
       ],
       "status": "ready",
       "rules": 7,
-      "version": 4
+      "version": 6
     },
     {
       "name": "design-accessibility",
@@ -221,7 +224,7 @@
       ],
       "status": "ready",
       "rules": 4,
-      "version": 4
+      "version": 5
     },
     {
       "name": "figma-to-react-components",
@@ -239,7 +242,7 @@
       ],
       "status": "ready",
       "rules": 5,
-      "version": 3
+      "version": 4
     },
     {
       "name": "liquid-glass-ios",
@@ -254,7 +257,7 @@
         "design"
       ],
       "status": "ready",
-      "version": 4
+      "version": 6
     },
     {
       "name": "swift-concurrency",
@@ -269,7 +272,7 @@
         "ios"
       ],
       "status": "ready",
-      "version": 4
+      "version": 5
     },
     {
       "name": "promptify",
@@ -285,7 +288,7 @@
       ],
       "status": "ready",
       "rules": 11,
-      "version": 5
+      "version": 6
     },
     {
       "name": "agent-add-rule",
@@ -299,7 +302,7 @@
         "configuration"
       ],
       "status": "ready",
-      "version": 3
+      "version": 4
     },
     {
       "name": "agent-init-deep",
@@ -313,7 +316,7 @@
         "setup"
       ],
       "status": "ready",
-      "version": 3
+      "version": 4
     },
     {
       "name": "agent-skill-creator",
@@ -327,7 +330,7 @@
         "templates"
       ],
       "status": "ready",
-      "version": 6
+      "version": 7
     },
     {
       "name": "agent-pr-creator",
@@ -343,7 +346,7 @@
         "gh-cli"
       ],
       "status": "ready",
-      "version": 1
+      "version": 5
     },
     {
       "name": "localize-ios",
@@ -359,7 +362,7 @@
         "uikit"
       ],
       "status": "ready",
-      "version": 2
+      "version": 5
     },
     {
       "name": "tech-android",
@@ -373,10 +376,10 @@
         "jetpack",
         "mobile"
       ],
-      "extends": "platform-mobile",
+      "extends": "core-coding-standards",
       "status": "ready",
       "rules": 11,
-      "version": 5
+      "version": 6
     },
     {
       "name": "rewrite-commit-history",
@@ -391,7 +394,7 @@
         "rewrite"
       ],
       "status": "ready",
-      "version": 2
+      "version": 3
     },
     {
       "name": "pr-comments-address",
@@ -408,7 +411,7 @@
         "gh-cli"
       ],
       "status": "ready",
-      "version": 2
+      "version": 6
     },
     {
       "name": "type-system-audit",
@@ -422,7 +425,7 @@
         "code-quality"
       ],
       "status": "ready",
-      "version": 3
+      "version": 7
     },
     {
       "name": "transcript-notes",
@@ -436,7 +439,7 @@
         "documentation"
       ],
       "status": "ready",
-      "version": 1
+      "version": 2
     },
     {
       "name": "eval-agent-md",
@@ -452,84 +455,7 @@
         "quality"
       ],
       "status": "ready",
-      "version": 7
-    },
-    {
-      "name": "tech-prisma",
-      "source": "./skills/database/tech-prisma",
-      "description": "Draft scaffold; incomplete and not for normal use. Prisma ORM schema design and query patterns. Extends platform-database with Prisma-specific rules. Use when working with Prisma.",
-      "category": "database",
-      "tags": [
-
-      ],
-      "status": "draft",
-      "version": 1
-    },
-    {
-      "name": "tech-tanstack-form",
-      "source": "./skills/frontend/tech-tanstack-form",
-      "description": "Draft scaffold; incomplete and not for normal use. TanStack Form patterns for type-safe form management. Extends platform-frontend with form-specific rules. Use when building forms with TanStack Form.",
-      "category": "frontend",
-      "tags": [
-
-      ],
-      "status": "draft",
-      "version": 1
-    },
-    {
-      "name": "tech-tanstack-router",
-      "source": "./skills/frontend/tech-tanstack-router",
-      "description": "Draft scaffold; incomplete and not for normal use. TanStack Router patterns for type-safe routing. Extends platform-frontend with router-specific rules. Use when building with TanStack Router.",
-      "category": "frontend",
-      "tags": [
-
-      ],
-      "status": "draft",
-      "version": 1
-    },
-    {
-      "name": "design-mobile",
-      "source": "./skills/mobile/design-mobile",
-      "description": "Draft scaffold; incomplete and not for normal use. Mobile-specific visual design patterns — touch targets, gestures, and platform conventions. Use when designing mobile interfaces.",
-      "category": "mobile",
-      "tags": [
-
-      ],
-      "status": "draft",
-      "version": 1
-    },
-    {
-      "name": "platform-mobile",
-      "source": "./skills/mobile/platform-mobile",
-      "description": "Draft scaffold; incomplete and not for normal use. Cross-platform mobile development patterns. Extends core-coding-standards with mobile-specific rules. Use when building mobile apps.",
-      "category": "mobile",
-      "tags": [
-
-      ],
-      "status": "draft",
-      "version": 1
-    },
-    {
-      "name": "tech-ios",
-      "source": "./skills/mobile/tech-ios",
-      "description": "Draft scaffold; incomplete and not for normal use. iOS and Swift development patterns. Extends platform-mobile with iOS-specific rules. See swift-concurrency skill for async/await patterns and liquid-glass-ios skill for iOS 26+ UI design. Use for general iOS development guidance.",
-      "category": "mobile",
-      "tags": [
-
-      ],
-      "status": "draft",
-      "version": 1
-    },
-    {
-      "name": "tech-react-native",
-      "source": "./skills/mobile/tech-react-native",
-      "description": "Draft scaffold; incomplete and not for normal use. React Native development patterns. Extends platform-mobile and tech-react with React Native-specific rules. Use when building React Native apps.",
-      "category": "mobile",
-      "tags": [
-
-      ],
-      "status": "draft",
-      "version": 1
+      "version": 12
     },
     {
       "name": "parallel",
@@ -561,105 +487,7 @@
       "extends": "core-coding-standards",
       "status": "ready",
       "rules": 0,
-      "version": 5
+      "version": 8
     }
-  ],
-  "drafts": [
-    {
-      "name": "platform-mobile",
-      "source": "skills/mobile/platform-mobile",
-      "description": "Cross-platform mobile development patterns — navigation, gestures, offline, performance.",
-      "category": "mobile",
-      "tags": [
-        "mobile",
-        "ios",
-        "android",
-        "navigation",
-        "offline"
-      ],
-      "extends": "core-coding-standards"
-    },
-    {
-      "name": "tech-ios",
-      "source": "skills/mobile/tech-ios",
-      "description": "iOS and Swift development patterns.",
-      "category": "mobile",
-      "tags": [
-        "ios",
-        "swift",
-        "swiftui",
-        "apple",
-        "mobile"
-      ],
-      "extends": "platform-mobile"
-    },
-    {
-      "name": "tech-react-native",
-      "source": "skills/mobile/tech-react-native",
-      "description": "React Native development patterns — Expo, navigation, native modules.",
-      "category": "mobile",
-      "tags": [
-        "react-native",
-        "expo",
-        "mobile",
-        "cross-platform"
-      ],
-      "extends": "platform-mobile"
-    },
-    {
-      "name": "tech-prisma",
-      "source": "skills/database/tech-prisma",
-      "description": "Prisma ORM schema design, queries, relations, and migrations.",
-      "category": "database",
-      "tags": [
-        "prisma",
-        "orm",
-        "database",
-        "web"
-      ],
-      "extends": "platform-database"
-    },
-    {
-      "name": "tech-tanstack-router",
-      "source": "skills/frontend/tech-tanstack-router",
-      "description": "TanStack Router patterns for type-safe file-based routing, loaders, and navigation.",
-      "category": "frontend",
-      "tags": [
-        "tanstack",
-        "router",
-        "routing",
-        "web"
-      ],
-      "extends": "platform-frontend"
-    },
-    {
-      "name": "tech-tanstack-form",
-      "source": "skills/frontend/tech-tanstack-form",
-      "description": "TanStack Form patterns for type-safe form state, validation, and field arrays.",
-      "category": "frontend",
-      "tags": [
-        "tanstack",
-        "forms",
-        "validation",
-        "web"
-      ],
-      "extends": "platform-frontend"
-    },
-    {
-      "name": "design-mobile",
-      "source": "skills/mobile/design-mobile",
-      "description": "Mobile-specific visual design — touch targets, gestures, platform conventions.",
-      "category": "mobile",
-      "tags": [
-        "design",
-        "mobile",
-        "touch",
-        "gestures"
-      ],
-      "extends": "design"
-    }
-  ],
-  "experimental": [
-
   ]
 }

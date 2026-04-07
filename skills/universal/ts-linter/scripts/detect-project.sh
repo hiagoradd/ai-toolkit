@@ -53,18 +53,18 @@ const flags = {
 // React Native implies React
 if (flags.reactNative) flags.react = true;
 
-// Detect lint/typecheck/test scripts
+// Detect lint/typecheck/test script names (PM prefix added later by shell)
 const scripts = pkg.scripts || {};
 const scriptInfo = {
-  lintCmd: null,
-  typecheckCmd: null,
-  testCmd: null,
+  lintScript: null,
+  typecheckScript: null,
+  testScript: null,
 };
 
 for (const [key, val] of Object.entries(scripts)) {
-  if (/^lint(:|$)/.test(key) && !scriptInfo.lintCmd) scriptInfo.lintCmd = 'npm run ' + key;
-  if (/^(typecheck|type-check|tsc|check)$/.test(key) && !scriptInfo.typecheckCmd) scriptInfo.typecheckCmd = 'npm run ' + key;
-  if (/^test(:|$)/.test(key) && !key.includes('e2e') && !scriptInfo.testCmd) scriptInfo.testCmd = 'npm run ' + key;
+  if (/^lint(:|$)/.test(key) && !scriptInfo.lintScript) scriptInfo.lintScript = key;
+  if (/^(typecheck|type-check|tsc|check)$/.test(key) && !scriptInfo.typecheckScript) scriptInfo.typecheckScript = key;
+  if (/^test(:|$)/.test(key) && !key.includes('e2e') && !scriptInfo.testScript) scriptInfo.testScript = key;
 }
 
 // Detect workspaces
@@ -242,6 +242,26 @@ if [[ "$HAS_NESTJS" == "true" ]]; then
   HAS_NODE_BACKEND=true
 fi
 
+# --- Detect ShadCN UI ---
+# ShadCN generates multi-component files by design. Detected via:
+# 1. components.json (ShadCN config file), AND
+# 2. @radix-ui/* or class-variance-authority in deps
+
+HAS_SHADCN=false
+if [[ -f "$ROOT/components.json" ]]; then
+  # Verify it's actually ShadCN by checking for Radix UI or CVA in deps
+  SHADCN_CONFIRM=$(PKG_PATH="$PKG" node -e "
+    const pkg = JSON.parse(require('fs').readFileSync(process.env.PKG_PATH, 'utf8'));
+    const all = { ...pkg.dependencies, ...pkg.devDependencies };
+    const hasRadix = Object.keys(all).some(k => k.startsWith('@radix-ui/'));
+    const hasCva = 'class-variance-authority' in all;
+    console.log(hasRadix || hasCva);
+  " 2>/dev/null)
+  if [[ "$SHADCN_CONFIRM" == "true" ]]; then
+    HAS_SHADCN=true
+  fi
+fi
+
 # --- Detect package manager ---
 
 PKG_MANAGER="npm"
@@ -299,11 +319,26 @@ NATIVE_GLOBS=$(build_glob_array native apps/native apps/mobile packages/native p
 DB_GLOBS=$(build_glob_array db src/db packages/db apps/api/db server/db)
 E2E_GLOBS=$(build_glob_array e2e tests/e2e test/e2e apps/web/e2e packages/e2e)
 
-# --- Extract detected commands ---
+# --- Extract detected commands (PM-aware) ---
 
-LINT_CMD=$(echo "$DEP_FLAGS" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const o=JSON.parse(d);console.log(o.scripts?.lintCmd||'')})")
-TSC_CMD=$(echo "$DEP_FLAGS" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const o=JSON.parse(d);console.log(o.scripts?.typecheckCmd||'')})")
-TEST_CMD=$(echo "$DEP_FLAGS" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const o=JSON.parse(d);console.log(o.scripts?.testCmd||'')})")
+# Build the run prefix for the detected package manager
+case "$PKG_MANAGER" in
+  pnpm)  RUN_PREFIX="pnpm run" ;;
+  yarn)  RUN_PREFIX="yarn" ;;
+  bun)   RUN_PREFIX="bun run" ;;
+  *)     RUN_PREFIX="npm run" ;;
+esac
+
+LINT_SCRIPT=$(echo "$DEP_FLAGS" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const o=JSON.parse(d);console.log(o.scripts?.lintScript||'')})")
+TSC_SCRIPT=$(echo "$DEP_FLAGS" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const o=JSON.parse(d);console.log(o.scripts?.typecheckScript||'')})")
+TEST_SCRIPT=$(echo "$DEP_FLAGS" | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const o=JSON.parse(d);console.log(o.scripts?.testScript||'')})")
+
+LINT_CMD=""
+TSC_CMD=""
+TEST_CMD=""
+[[ -n "$LINT_SCRIPT" ]] && LINT_CMD="$RUN_PREFIX $LINT_SCRIPT"
+[[ -n "$TSC_SCRIPT" ]] && TSC_CMD="$RUN_PREFIX $TSC_SCRIPT"
+[[ -n "$TEST_SCRIPT" ]] && TEST_CMD="$RUN_PREFIX $TEST_SCRIPT"
 
 # --- Output ---
 
@@ -323,7 +358,8 @@ cat <<EOF
     "prettier": $HAS_PRETTIER,
     "next": $HAS_NEXT,
     "expo": $HAS_EXPO,
-    "nestjs": $HAS_NESTJS
+    "nestjs": $HAS_NESTJS,
+    "shadcn": $HAS_SHADCN
   },
   "packageManager": "$PKG_MANAGER",
   "buildTool": "$BUILD_TOOL",

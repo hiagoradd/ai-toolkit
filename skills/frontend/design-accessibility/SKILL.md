@@ -3,6 +3,14 @@ name: design-accessibility
 description: WCAG AA and ARIA best practices — screen readers, keyboard navigation,
   focus management. Use when building any user-facing interface or reviewing accessibility
   compliance.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: frontend
   tags:
@@ -11,7 +19,7 @@ metadata:
   - aria
   - a11y
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Principles

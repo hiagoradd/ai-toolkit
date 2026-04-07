@@ -56,12 +56,30 @@ def slugify_rule_name(name: str) -> str:
 
 
 def extract_rules(content: str) -> list[dict[str, str]]:
-    """Extract rules from markdown H2 headings with stable identifiers."""
+    """Extract rules from markdown H2 headings or YAML-like section labels.
+
+    Supports two formats:
+    - Standard markdown: ``## Rule Name``
+    - Compact YAML-like: ``SECTION:\\n  key: value`` (all-caps label at line start)
+    """
     rules = []
+    seen: set[str] = set()
+
+    # Standard: ## headings
     for match in re.finditer(r"^##\s+(.+)$", content, re.MULTILINE):
         name = match.group(1).strip()
         if name.lower() not in _NON_RULE_SECTIONS:
             rules.append({"rule_id": slugify_rule_name(name), "rule_name": name})
+            seen.add(name)
+
+    # Fallback: YAML-like all-caps section labels (e.g. "COMPLEXITY:")
+    if not rules:
+        for match in re.finditer(r"^([A-Z][A-Z_]+):\s*$", content, re.MULTILINE):
+            name = match.group(1).strip()
+            if name not in seen:
+                rules.append({"rule_id": slugify_rule_name(name), "rule_name": name})
+                seen.add(name)
+
     return rules
 
 
@@ -85,14 +103,30 @@ def _rule_catalog_map(rules: list[dict] | list[str]) -> dict[str, str]:
     return {rule["rule_name"]: rule["rule_id"] for rule in normalized_rules}
 
 
+def _fuzzy_match_rule(rule_name: str, rules: list[dict] | list[str]) -> str | None:
+    """Try exact match first, then slug-prefix match against the rule catalog."""
+    rule_id_by_name = _rule_catalog_map(rules)
+
+    # Exact match on rule_name
+    if rule_name in rule_id_by_name:
+        return rule_id_by_name[rule_name]
+
+    # Slug-based: match if scenario rule slug starts with a catalog rule slug
+    scenario_slug = slugify_rule_name(rule_name)
+    for catalog_name, catalog_id in rule_id_by_name.items():
+        if scenario_slug.startswith(catalog_id) or catalog_id.startswith(scenario_slug):
+            return catalog_id
+
+    return None
+
+
 def normalize_scenario(scenario: dict, rules: list[dict] | list[str]) -> dict | None:
     """Derive and validate stable metadata for a per-rule scenario."""
     rule_name = scenario.get("rule")
     if not isinstance(rule_name, str):
         return None
 
-    rule_id_by_name = _rule_catalog_map(rules)
-    derived_rule_id = rule_id_by_name.get(rule_name)
+    derived_rule_id = _fuzzy_match_rule(rule_name, rules)
     if not derived_rule_id:
         return None
 
@@ -107,11 +141,12 @@ def normalize_integration_scenario(scenario: dict, rules: list[dict] | list[str]
     if not isinstance(rules_tested, list) or not all(isinstance(rule, str) for rule in rules_tested):
         return None
 
-    rule_id_by_name = _rule_catalog_map(rules)
-    try:
-        derived_rule_ids = [rule_id_by_name[rule_name] for rule_name in rules_tested]
-    except KeyError:
-        return None
+    derived_rule_ids = []
+    for rule_name in rules_tested:
+        rule_id = _fuzzy_match_rule(rule_name, rules)
+        if rule_id is None:
+            return None
+        derived_rule_ids.append(rule_id)
 
     normalized = dict(scenario)
     normalized["rule_ids_tested"] = derived_rule_ids
@@ -266,7 +301,7 @@ def generate_scenarios(config_path: Path, is_agent: bool = False,
 Generate the JSON array now."""
 
     line_count = len(content.splitlines())
-    timeout = max(120, line_count * 2)
+    timeout = max(600, line_count * 2)
     started_at = time.perf_counter()
     raw = claude_pipe(prompt, model=model, system_prompt=SYSTEM_PROMPT, timeout=timeout)
     elapsed_seconds = time.perf_counter() - started_at
@@ -369,7 +404,7 @@ Generate the JSON array now."""
 
     line_count = len(content.splitlines())
     # Integration scenarios require more reasoning time than per-rule (analyzing interactions)
-    timeout = max(180, line_count * 3)
+    timeout = max(720, line_count * 3)
     started_at = time.perf_counter()
     raw = claude_pipe(prompt, model=model, system_prompt=SYSTEM_PROMPT_INTEGRATION, timeout=timeout)
     elapsed_seconds = time.perf_counter() - started_at

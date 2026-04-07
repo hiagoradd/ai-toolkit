@@ -1,5 +1,5 @@
 {
-  "_comment": "Replace <LINT_CMD> and <TSC_CMD> with detected commands from package.json. Fallbacks: 'npx eslint . --quiet' and 'npx tsc --noEmit'.",
+  "_comment": "Replace <LINT_CMD> and <TSC_CMD> with detected commands from package.json. Fallbacks: 'npx eslint . --max-warnings=0' and 'npx tsc --noEmit'.",
   "hooks": {
     "PostToolUse": [
       {

@@ -4,6 +4,14 @@ description: Convert Figma component designs into production-ready React impleme
   with design token integration, accessibility via React Aria, and comprehensive documentation.
   Use when building React components from Figma designs, generating component implementation
   specs, or bridging design-to-development workflows.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: frontend
   tags:
@@ -15,7 +23,7 @@ metadata:
   - react-aria
   - design-handoff
   status: ready
-  version: 3
+  version: 4
 ---
 
 # Figma to React Component Converter

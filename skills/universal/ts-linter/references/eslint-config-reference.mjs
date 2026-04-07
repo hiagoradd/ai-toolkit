@@ -68,7 +68,8 @@ export default defineConfig(
 	securityPlugin.configs.recommended,
 	sonarjs.configs.recommended,
 	regexpPlugin.configs["flat/recommended"],
-	// Note: eslint-comments/no-unused-disable is deprecated in v4.7+
+	// ESLint 9.17+ has native reportUnusedDisableDirectives; this plugin
+	// still works but can be removed once your project requires ESLint >=9.17.
 	eslintComments.recommended,
 
 	// ============================================================
@@ -77,6 +78,16 @@ export default defineConfig(
 	// Enables rules that read your tsconfig for type information.
 	// Update `allowDefaultProject` with any JS config files in
 	// your repo root that aren't covered by a tsconfig.
+	//
+	// MONOREPO NOTE (Turborepo / pnpm workspaces):
+	// Keep tsconfigRootDir pointed at the repo root. ESLint's
+	// projectService walks up from each file to find the nearest
+	// tsconfig.json, so per-app configs (apps/web/tsconfig.json)
+	// are picked up automatically. If the root tsconfig.json is a
+	// base config, do NOT set "include" in it — let each workspace
+	// define its own. If root-level .ts files (e.g. scripts/*.ts)
+	// still get "file not covered" errors, add them to
+	// allowDefaultProject below.
 	// ============================================================
 	{
 		languageOptions: {
@@ -110,6 +121,15 @@ export default defineConfig(
 		},
 	},
 	reactYouMightNotNeedAnEffect.configs.recommended,
+	{
+		rules: {
+			// Catch nested components (faster than react-hooks/static-components)
+			"react/no-unstable-nested-components": "error",
+
+			// One component per file — keeps files focused and easy to find
+			"react/no-multi-comp": ["error", { ignoreStateless: false }],
+		},
+	},
 
 	// ============================================================
 	// ⚛️ TANSTACK QUERY
@@ -162,14 +182,6 @@ export default defineConfig(
 			// and the allowList needed to make this usable is massive
 			"unicorn/prevent-abbreviations": "off",
 
-			// -- React rules (REMOVE if not using React) --
-
-			// Catch nested components (faster than react-hooks/static-components)
-			"react/no-unstable-nested-components": "error",
-
-			// One component per file — keeps files focused and easy to find
-			"react/no-multi-comp": ["error", { ignoreStateless: false }],
-
 			// Cap file length at 300 lines to encourage splitting
 			"max-lines": [
 				"error",
@@ -192,6 +204,22 @@ export default defineConfig(
 	// 		"max-lines": "off",
 	// 	},
 	// },
+
+	// ============================================================
+	// 🎨 SHADCN UI COMPONENTS (generated multi-component files)
+	//
+	// REMOVE if you don't use ShadCN UI.
+	// ShadCN generates multi-component files by design (e.g., table.tsx
+	// exports Table, TableHeader, TableBody, TableRow, etc.)
+	// This is part of the initial config, not a per-line suppression.
+	// ============================================================
+	{
+		files: ["**/components/ui/**/*.tsx"],
+		rules: {
+			"react/no-multi-comp": "off",
+			"max-lines": "off",
+		},
+	},
 
 	// ============================================================
 	// 🧪 TEST & CONFIG FILES — relax strict rules
@@ -314,14 +342,21 @@ export default defineConfig(
 	//
 	// REMOVE this entire section if you don't have a native app.
 	// 📦 @react-native/eslint-config (official, replaces eslint-plugin-react-native)
+	// Note: @react-native/eslint-config/flat exports an array — spread at top level
 	// ============================================================
-	{
+	...reactNativeConfig.map((entry) => ({
+		...entry,
 		files: [
 			// UPDATE these globs to match your React Native app
 			"**/native/**/*.tsx",
 			"**/native/**/*.ts",
 		],
-		...reactNativeConfig,
+	})),
+	{
+		files: [
+			"**/native/**/*.tsx",
+			"**/native/**/*.ts",
+		],
 		languageOptions: {
 			globals: {
 				...globals.browser,

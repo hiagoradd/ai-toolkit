@@ -135,7 +135,7 @@ def generate_mutation(config_content: str, scenario: dict, scenarios_file: Path)
     )
 
     line_count = len(config_content.splitlines())
-    timeout = max(60, line_count)
+    timeout = max(120, line_count)
     raw = claude_pipe(prompt, model="sonnet", system_prompt=MUTATION_SYSTEM, timeout=timeout)
     text = strip_markdown_fences(raw)
     try:

@@ -3,6 +3,14 @@ name: platform-frontend
 description: Framework-agnostic frontend architecture — state management, components,
   data fetching. Use when building any web frontend, choosing state patterns, or structuring
   UI code.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: frontend
   extends: core-coding-standards
@@ -12,7 +20,7 @@ metadata:
   - components
   - state
   status: ready
-  version: 4
+  version: 5
 ---
 
 # Principles

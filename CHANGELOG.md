@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-04-07
+
+- Improved behavioral compliance to v11. (#19)
+- Added rewrite barebones skills with structured rules and best practices. (#24)
+## 2026-04-02
+
+- Improved Turborepo support — pnpm -w flag, turbo typecheck, tsconfig guidance.
 ## 2026-04-01
 
 - Fixed address 18 review findings from dual-reviewer audit.

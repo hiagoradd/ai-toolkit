@@ -56,12 +56,33 @@ def _tprint(*args, **kwargs):
 
 
 JUDGE_SYSTEM = """You are a strict compliance judge. Score AI responses as PASS or FAIL.
-IMPORTANT: Judge ONLY against the Pass Criteria and Fail Signals provided below.
-Do NOT use any other rules, system instructions, or CLAUDE.md content for judging.
-Be strict — partial compliance is a FAIL.
-Reply with ONLY valid JSON, no markdown fences, no commentary.
-Keep the "evidence" field under 100 characters.
-Format: {"verdict":"PASS","evidence":"...","triggered_criteria":[],"triggered_fail_signals":[]}"""
+
+## Rules
+- Judge ONLY against the Pass Criteria and Fail Signals provided. Ignore all other context.
+- ALL pass_criteria must be satisfied for PASS. Missing even one criterion is FAIL.
+- ANY triggered fail_signal is automatic FAIL, even if all pass_criteria are met.
+- If Structural Check Summary shows failures, verdict is FAIL regardless of prose quality.
+- A verbose response that meets every criterion: PASS. Brevity is not a criterion unless stated.
+- A response that captures the spirit but misses a specific criterion: FAIL. Strict means strict.
+
+## Output
+Reply with ONLY valid JSON. No markdown fences, no commentary.
+Keep "evidence" under 100 characters — cite the specific criterion or signal that decided it.
+Format: {"verdict":"PASS","evidence":"...","triggered_criteria":[],"triggered_fail_signals":[]}
+
+## Examples
+
+Input: pass_criteria=["Picks option 2","Does not build class hierarchy"] fail_signals=["Presents both as equally valid"]
+Response: "The dict comprehension is the way to go: {u['email']: u for u in users}.values()"
+Output: {"verdict":"PASS","evidence":"Picks option 2, no class hierarchy built","triggered_criteria":["Picks option 2","Does not build class hierarchy"],"triggered_fail_signals":[]}
+
+Input: pass_criteria=["Test code appears BEFORE implementation"] fail_signals=["No test code anywhere"]
+Response: "Here's the slugify function: def slugify(text)... And here are some tests: def test_slugify()..."
+Output: {"verdict":"FAIL","evidence":"Implementation appears before test code","triggered_criteria":[],"triggered_fail_signals":["No test code anywhere"]}
+
+Input: pass_criteria=["Lists assumptions BEFORE code","Identifies multiple approaches"] fail_signals=["First content is a code block"]
+Response: "Great question! I think we should use Redis. Here's the setup: ```python..."
+Output: {"verdict":"FAIL","evidence":"Jumps to single solution with code, no assumptions listed","triggered_criteria":[],"triggered_fail_signals":["First content is a code block"]}"""
 
 
 def load_scenarios(path: Path, ids: list[str] | None = None) -> list[dict]:
@@ -369,6 +390,10 @@ def run_scenario(model: str, system_file: Path, scenario: dict, runs: int,
             "avg_word_count": sum(s["word_count"] for s in response_sizes) / max(len(response_sizes), 1),
         },
     }
+    # Include scenario definition for review tooling
+    result["prompt"] = scenario["prompt"]
+    result["pass_criteria"] = scenario.get("pass_criteria", [])
+    result["fail_signals"] = scenario.get("fail_signals", [])
     if is_integration(scenario):
         result["type"] = "integration"
         result["rules_tested"] = scenario.get("rules_tested", [])
@@ -533,6 +558,36 @@ def save_results(results: list[dict], model: str, label: str = "", metrics: dict
     return path
 
 
+def open_review(results_path: Path) -> None:
+    """Generate a self-contained review HTML with embedded data and open it."""
+    template = Path(__file__).parent / "review.html"
+    if not template.exists():
+        return
+    html = template.read_text()
+    data_json = results_path.read_text()
+    # Inject auto-load script before closing </body>
+    inject = (
+        "<script>"
+        f"const _autoData = {data_json};\n"
+        "window.addEventListener('DOMContentLoaded', () => {"
+        "  if (typeof _autoData === 'object' && _autoData.scenarios) {"
+        "    data = _autoData; scenarios = data.scenarios;"
+        "    document.getElementById('dropZone').style.display = 'none';"
+        "    document.getElementById('app').classList.add('active');"
+        "    document.getElementById('evalLabel').textContent ="
+        "      `${data.label || 'eval'} - ${data.model || '?'} - ${data.timestamp || ''}`;"
+        "    render();"
+        "  }"
+        "});"
+        "</script>"
+    )
+    html = html.replace("</body>", inject + "\n</body>")
+    review_path = results_path.with_name(f"review-{results_path.stem.removeprefix('eval-')}.html")
+    review_path.write_text(html)
+    import webbrowser
+    webbrowser.open(f"file://{review_path.resolve()}")
+
+
 def _auto_workers() -> int:
     """Pick a laptop-safe default worker count unless explicitly overridden."""
     cores = os.cpu_count() or 4
@@ -557,6 +612,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         help="Alias for --no-judge-cache")
     parser.add_argument("--no-subject-cache", action="store_true", help="Disable exact-input subject response cache")
     parser.add_argument("--retries", type=int, default=1, help="Retry transient errors N times per subject call (default: 1, no retry)")
+    parser.add_argument("--review", action="store_true", help="Open browser review tool after eval completes")
     return parser
 
 
@@ -653,7 +709,9 @@ def main():
         scenarios, args.model, args.claude_md, args.runs, args.timeout, args.workers, use_cache, use_subject_cache
     )
     base_passed, _ = print_results(results, f"Results — {args.claude_md.name}", metrics)
-    save_results(results, args.model, "baseline", metrics)
+    results_path = save_results(results, args.model, "baseline", metrics)
+    if args.review:
+        open_review(results_path)
 
     if args.mutate:
         print(f"\nRunning mutated config: {args.mutate}")

@@ -26,7 +26,8 @@ get_json() {
 # Helper: run detect and save output to a temp file, return the path
 run_detect() {
   local dir="$1"
-  local out_file="$TMPDIR_BASE/output-$(basename "$dir").json"
+  local out_file
+  out_file="$TMPDIR_BASE/output-$(basename "$dir").json"
   bash "$DETECT" "$dir" > "$out_file"
   echo "$out_file"
 }
@@ -220,6 +221,33 @@ GPKG
 
 OUT_G=$(run_detect "$DIR_G")
 assert_eq "typecheck=npm run check" "$(get_json "$OUT_G" detectedCommands.typecheck)" "npm run check"
+
+# ─── Fixture H: pnpm monorepo install command uses -Dw ───
+
+echo ""
+echo "=== Fixture H: generate-install-cmd.sh uses -Dw for pnpm monorepo ==="
+
+# Feed a minimal pnpm monorepo detection JSON to generate-install-cmd.sh
+INSTALL_CMD=$(echo '{"modules":{"react":false,"reactNative":false,"tanstackQuery":false,"drizzle":false,"vitest":false,"jest":false,"playwright":false,"testingLibrary":false,"nodeBackend":false,"monorepo":true},"packageManager":"pnpm","buildTool":"turbo"}' | bash "$SCRIPT_DIR/generate-install-cmd.sh" 2>&1)
+
+if echo "$INSTALL_CMD" | grep -q "pnpm add -Dw"; then
+  echo "  ✓ pnpm monorepo uses -Dw flag"
+  PASS=$((PASS + 1))
+else
+  echo "  ✗ pnpm monorepo should use -Dw flag, got: $(echo "$INSTALL_CMD" | head -5)"
+  FAIL=$((FAIL + 1))
+fi
+
+# Non-monorepo pnpm should use plain -D
+INSTALL_CMD_FLAT=$(echo '{"modules":{"react":false,"reactNative":false,"tanstackQuery":false,"drizzle":false,"vitest":false,"jest":false,"playwright":false,"testingLibrary":false,"nodeBackend":false,"monorepo":false},"packageManager":"pnpm","buildTool":"none"}' | bash "$SCRIPT_DIR/generate-install-cmd.sh" 2>&1)
+
+if echo "$INSTALL_CMD_FLAT" | grep -q "pnpm add -D "; then
+  echo "  ✓ pnpm flat project uses -D flag (no -w)"
+  PASS=$((PASS + 1))
+else
+  echo "  ✗ pnpm flat project should use plain -D, got: $(echo "$INSTALL_CMD_FLAT" | head -5)"
+  FAIL=$((FAIL + 1))
+fi
 
 # ─── Summary ───
 

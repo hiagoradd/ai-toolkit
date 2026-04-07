@@ -3,6 +3,14 @@ name: platform-cli
 description: Design and implementation patterns for building command-line tools with
   modern UX. Use when designing a CLI, reviewing CLI UX, defining commands and flags,
   or implementing error handling and signal handling.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: cli
   extends: core-coding-standards
@@ -12,7 +20,7 @@ metadata:
   - commands
   - flags
   status: ready
-  version: 4
+  version: 5
 ---
 
 # CLI Development Patterns

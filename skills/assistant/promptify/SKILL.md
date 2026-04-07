@@ -4,6 +4,14 @@ description: Transform user requests into detailed, precise prompts for AI model
   Use when users say 'promptify', 'promptify this', 'rewrite this prompt', 'make this
   prompt better/more specific', or explicitly request prompt engineering or improvement
   of their request for better AI responses.
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: assistant
   tags:
@@ -13,7 +21,7 @@ metadata:
   - specification
   - rewriting
   status: ready
-  version: 5
+  version: 6
   triggers:
     positive:
     - 'Promptify this: audit all skills against our findings doc.'

@@ -21,12 +21,21 @@ if [[ -z "$input" ]]; then
   exit 0
 fi
 
-# --- Extract file_path without jq ---
+# --- Extract file_path and cwd without jq ---
 # Works for Edit, Write, MultiEdit — all put file_path in tool_input.
 # Handles both "file_path": "/abs/path" and "file_path": "rel/path".
 file_path=""
 if [[ "$input" =~ \"file_path\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
   file_path="${BASH_REMATCH[1]}"
+fi
+
+# Extract cwd from payload and cd into it for lockfile/runner detection
+hook_cwd=""
+if [[ "$input" =~ \"cwd\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+  hook_cwd="${BASH_REMATCH[1]}"
+fi
+if [[ -n "$hook_cwd" ]] && [[ -d "$hook_cwd" ]]; then
+  cd "$hook_cwd" || true
 fi
 
 # --- Early exits ---
@@ -77,10 +86,12 @@ if [[ "$fail_count" -ge 5 ]]; then
 fi
 
 # --- Detect package runner ---
-# Supports npx, bunx, and yarn (PnP). Falls back gracefully.
+# Supports npx, pnpm, bunx, and yarn (PnP). Falls back gracefully.
 RUNNER=""
 if [[ -f "bun.lockb" ]] || [[ -f "bun.lock" ]]; then
   command -v bunx &>/dev/null && RUNNER="bunx"
+elif [[ -f "pnpm-lock.yaml" ]]; then
+  command -v pnpm &>/dev/null && RUNNER="pnpm exec"
 elif [[ -f ".pnp.cjs" ]] || [[ -f ".pnp.js" ]]; then
   command -v yarn &>/dev/null && RUNNER="yarn exec"
 fi
@@ -89,7 +100,7 @@ if [[ -z "$RUNNER" ]]; then
 fi
 
 # Quick check that eslint is actually installed in the project
-# Skip node_modules check for Yarn PnP and Bun
+# Skip node_modules check for Yarn PnP, Bun, and pnpm (strict node_modules)
 if [[ "$RUNNER" == "npx" ]]; then
   if [[ ! -d "node_modules/.bin" ]] || ! npx eslint --version &>/dev/null; then
     exit 0
@@ -107,6 +118,14 @@ lint_exit=$?
 if [[ $lint_exit -eq 0 ]]; then
   # File is clean — reset the circuit breaker for this file
   rm -f "$breaker_file" 2>/dev/null
+  exit 0
+fi
+
+# --- No config in scope: don't block ---
+# ESLint v9 flat config prints "Could not find config file" when no
+# eslint.config.* exists walking up from the linted file (e.g., tooling dirs
+# outside the main project tree). This is not a lint error — skip silently.
+if echo "$lint_out" | grep -q "Could not find config file"; then
   exit 0
 fi
 

@@ -14,6 +14,7 @@ get_field() {
 }
 
 PKG_MANAGER=$(get_field "packageManager")
+MONOREPO=$(get_field "monorepo")
 REACT=$(get_field "react")
 REACT_NATIVE=$(get_field "reactNative")
 TANSTACK=$(get_field "tanstackQuery")
@@ -22,7 +23,6 @@ VITEST=$(get_field "vitest")
 PLAYWRIGHT=$(get_field "playwright")
 TESTING_LIB=$(get_field "testingLibrary")
 NODE_BACKEND=$(get_field "nodeBackend")
-PRETTIER=$(get_field "prettier")
 
 # --- Core packages (always installed) ---
 CORE_PKGS=(
@@ -90,7 +90,14 @@ fi
 ALL_PKGS=("${CORE_PKGS[@]}" "${REACT_PKGS[@]}" "${NATIVE_PKGS[@]}" "${QUERY_PKGS[@]}" "${DRIZZLE_PKGS[@]}" "${TEST_PKGS[@]}" "${NODE_PKGS[@]}")
 
 case "$PKG_MANAGER" in
-  pnpm)  CMD="pnpm add -D" ;;
+  pnpm)
+    # pnpm monorepos require -w to install at the workspace root
+    if [[ "$MONOREPO" == "true" ]]; then
+      CMD="pnpm add -Dw"
+    else
+      CMD="pnpm add -D"
+    fi
+    ;;
   yarn)  CMD="yarn add -D" ;;
   bun)   CMD="bun add -D" ;;
   *)     CMD="npm install -D" ;;
@@ -127,9 +134,9 @@ echo "# Total packages: ${#ALL_PKGS[@]}"
 echo "#"
 echo "# Categories included:"
 echo "#   Core: ${#CORE_PKGS[@]} packages"
-[[ ${#REACT_PKGS[@]} -gt 0 ]] && echo "#   React: ${#REACT_PKGS[@]} packages" || true
-[[ ${#NATIVE_PKGS[@]} -gt 0 ]] && echo "#   React Native: ${#NATIVE_PKGS[@]} packages" || true
-[[ ${#QUERY_PKGS[@]} -gt 0 ]] && echo "#   TanStack Query: ${#QUERY_PKGS[@]} packages" || true
-[[ ${#DRIZZLE_PKGS[@]} -gt 0 ]] && echo "#   Drizzle ORM: ${#DRIZZLE_PKGS[@]} packages" || true
-[[ ${#TEST_PKGS[@]} -gt 0 ]] && echo "#   Testing: ${#TEST_PKGS[@]} packages" || true
-[[ ${#NODE_PKGS[@]} -gt 0 ]] && echo "#   Node.js: ${#NODE_PKGS[@]} packages" || true
+if [[ ${#REACT_PKGS[@]} -gt 0 ]]; then echo "#   React: ${#REACT_PKGS[@]} packages"; fi
+if [[ ${#NATIVE_PKGS[@]} -gt 0 ]]; then echo "#   React Native: ${#NATIVE_PKGS[@]} packages"; fi
+if [[ ${#QUERY_PKGS[@]} -gt 0 ]]; then echo "#   TanStack Query: ${#QUERY_PKGS[@]} packages"; fi
+if [[ ${#DRIZZLE_PKGS[@]} -gt 0 ]]; then echo "#   Drizzle ORM: ${#DRIZZLE_PKGS[@]} packages"; fi
+if [[ ${#TEST_PKGS[@]} -gt 0 ]]; then echo "#   Testing: ${#TEST_PKGS[@]} packages"; fi
+if [[ ${#NODE_PKGS[@]} -gt 0 ]]; then echo "#   Node.js: ${#NODE_PKGS[@]} packages"; fi

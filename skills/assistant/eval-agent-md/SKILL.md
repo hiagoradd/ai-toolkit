@@ -6,7 +6,17 @@ description: 'Behavioral compliance testing for any CLAUDE.md or agent definitio
   improves failing rules via automated mutation loop. Use when: (1) testing whether
   your CLAUDE.md rules are actually followed, (2) evaluating an agent definition for
   role-boundary compliance, (3) dogfooding a skill''s own SKILL.md. Triggers on: "eval",
-  "compliance test", "test my CLAUDE.md", "check rules", "behavioral test", "/eval-agent-md".'
+  "compliance test", "test my CLAUDE.md", "check rules", "behavioral test", "/eval-agent-md".
+  Do not trigger for: editing or writing CLAUDE.md rules, general code review, adding
+  linting config, or any task that is not explicitly about testing behavioral compliance.'
+allowed-tools:
+- Bash
+- Read
+- Write
+- Edit
+- Grep
+- Glob
+- Agent
 metadata:
   category: assistant
   tags:
@@ -17,7 +27,9 @@ metadata:
   - meta
   - quality
   status: ready
-  version: 7
+  version: 12
+compatibility:
+- claude-code
 ---
 
 # eval-agent-md — Behavioral Compliance Testing
@@ -35,7 +47,7 @@ metadata:
 
 ### Script Execution
 
-**Always run scripts with `uv run --script`** — never invoke them directly with `python` or `python3`. The scripts declare their own dependencies via inline `# /// script` metadata, and `uv run --script` handles dependency resolution automatically with no pip install needed.
+**Always run scripts with `uv run --script`** — never `python`, never `python3`, never a bare script name. The scripts declare their own dependencies via inline `# /// script` metadata; `uv run --script` resolves all dependencies automatically — no `pip install` required, ever. Invoking with `python` or `python3` will fail with import errors because the dependencies are not installed in the system environment.
 
 ### Progress Reporting
 
@@ -54,7 +66,7 @@ Find the target file to test. Priority order:
 3. Fall back to `~/.claude/CLAUDE.md` (user global)
 4. If none found, ask the user
 
-Read the file and confirm with the user: "I found [filename] at [path] ([N] lines). Testing this file."
+Read the file and confirm with the user: "I found [filename] at [path] ([N] lines). Testing this file." Wait for user acknowledgment before proceeding to Step 2.
 
 ### Step 2: Generate test scenarios
 
@@ -86,6 +98,8 @@ After generation, read the output file and show the user a summary:
 
 Ask the user: "Generated [N] test scenarios. Ready to run? (Or edit/skip any?)"
 
+**Validation gate:** If the output file is missing or contains 0 scenarios, do not proceed. Tell the user: "Scenario generation produced no scenarios. Check that the target file has clearly structured rules (headings, numbered items, or labeled sections)." Then stop.
+
 ### Step 3: Run behavioral tests
 
 Tell the user: "Running [N] scenarios x [runs] run(s) against [model]... each scenario calls `claude -p` twice (subject + judge), so this takes a few minutes. You'll see per-scenario results as they complete."
@@ -95,6 +109,10 @@ Also summarize the work budget before starting:
 - estimated subject calls
 - estimated judge calls
 - whether subject-response cache is warm or cold
+- subject effort level (matches --effort value, default: high)
+- judge effort: low (fixed — haiku scoring only)
+
+Tip: --effort low --runs 3 costs roughly the same as --effort high --runs 1 and gives majority-vote reliability — a practical default for regular compliance checks.
 
 **IMPORTANT: Do NOT capture output — run via the Bash tool so the user sees per-scenario progress (`[1/N] scenario_id... PASS/FAIL (Xs)`) in real time:**
 
@@ -115,6 +133,8 @@ Options the user can control:
 - `--no-subject-cache` — force fresh subject responses instead of exact-input cache reuse
 
 Results now include multi-dimensional metrics: per-scenario response size (char count, word count) alongside timing and cache stats. This enables better A/B comparison during mutation testing.
+
+**Validation gate:** If all scenarios return an error or null verdict (e.g., script crash, missing model), do not print a compliance report. Tell the user: "All scenarios failed to produce a verdict — the run may have crashed. Check the output above for errors before interpreting results." Then stop.
 
 ### Step 4: Report results
 
@@ -190,7 +210,8 @@ Parse the user's `/eval-agent-md` invocation for these common options:
 - `--skill` / `--agent` — hint the target type for better scenario generation
 - `--holistic` — also generate integration scenarios that test multiple rules interacting (priority ordering, conflict resolution, cumulative compliance)
 - `--coverage` — report rule coverage after scenario generation (shows tested vs untested rules)
-- `--coverage` — report discovered-rule coverage after scenario generation, including rules with deterministic structural checks vs LLM-only checks
+- `--effort LEVEL` — effort for subject calls: low / medium / high (default: high). Lower effort reduces cost and latency.
+- `--gen-effort LEVEL` — effort for scenario generation: low / medium / high (default: medium). Use high for complex or densely-ruled files.
 - `--save-reference PATH` — save scenarios to a stable reference directory for deterministic test suites
 
 See `references/script-reference.md` for the full flag reference (caching, workers, compare-models, timeouts).
@@ -201,13 +222,25 @@ See `references/script-reference.md` for the full flag reference (caching, worke
 
 User: "Run compliance tests against my CLAUDE.md to check if all rules are being followed."
 
-Expected behavior: Use `eval-agent-md` workflow — locate the CLAUDE.md, generate test scenarios, run behavioral tests, and report compliance results.
+Expected behavior: Begin Step 1 immediately without asking for confirmation — locate the CLAUDE.md, confirm it with the user (filename, path, line count), then proceed through the full workflow: generate scenarios → run behavioral tests → report compliance score with per-rule pass/fail breakdown. Do not pause to ask permission or clarify intent before starting.
 
 ### Non-Trigger
 
 User: "Add a new linting rule to our ESLint config."
 
 Expected behavior: Do not use this skill. Choose a more relevant skill or proceed directly.
+
+### Non-Trigger (writing rules)
+
+User: "Help me write a new CLAUDE.md rule that enforces conventional commits."
+
+Expected behavior: Do not use this skill. The user is authoring rules, not testing whether existing rules are followed. Proceed directly without invoking the eval workflow.
+
+### Strictness Test
+
+User: "Test my CLAUDE.md and check if the rules hold even when Claude is being fast and lazy."
+
+Expected behavior: Immediately run with `--effort low --runs 3` — do not ask which file to use first, use the default file resolution (Step 1 priority order). Explain that low effort is a stricter bar for critical rules — if a rule fails at low effort, it means compliance relies on Claude being in careful mode, which is a fragility worth fixing.
 
 ## Troubleshooting
 
@@ -232,3 +265,5 @@ Expected behavior: Do not use this skill. Choose a more relevant skill or procee
 ## Reference Guides
 
 - **Full script reference**: `references/script-reference.md` — all flags, caching strategy, performance notes
+- **Scenario format**: `references/scenario-format.md` — YAML schema and field rules for manually reviewing or editing generated scenarios before running
+- **Report template**: `assets/report-template.md` — structured compliance report format with a Next Steps checklist
