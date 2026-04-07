@@ -558,6 +558,36 @@ def save_results(results: list[dict], model: str, label: str = "", metrics: dict
     return path
 
 
+def open_review(results_path: Path) -> None:
+    """Generate a self-contained review HTML with embedded data and open it."""
+    template = Path(__file__).parent / "review.html"
+    if not template.exists():
+        return
+    html = template.read_text()
+    data_json = results_path.read_text()
+    # Inject auto-load script before closing </body>
+    inject = (
+        "<script>"
+        f"const _autoData = {data_json};\n"
+        "window.addEventListener('DOMContentLoaded', () => {"
+        "  if (typeof _autoData === 'object' && _autoData.scenarios) {"
+        "    data = _autoData; scenarios = data.scenarios;"
+        "    document.getElementById('dropZone').style.display = 'none';"
+        "    document.getElementById('app').classList.add('active');"
+        "    document.getElementById('evalLabel').textContent ="
+        "      `${data.label || 'eval'} - ${data.model || '?'} - ${data.timestamp || ''}`;"
+        "    render();"
+        "  }"
+        "});"
+        "</script>"
+    )
+    html = html.replace("</body>", inject + "\n</body>")
+    review_path = results_path.with_name(f"review-{results_path.stem.removeprefix('eval-')}.html")
+    review_path.write_text(html)
+    import webbrowser
+    webbrowser.open(f"file://{review_path.resolve()}")
+
+
 def _auto_workers() -> int:
     """Pick a laptop-safe default worker count unless explicitly overridden."""
     cores = os.cpu_count() or 4
@@ -582,6 +612,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
                         help="Alias for --no-judge-cache")
     parser.add_argument("--no-subject-cache", action="store_true", help="Disable exact-input subject response cache")
     parser.add_argument("--retries", type=int, default=1, help="Retry transient errors N times per subject call (default: 1, no retry)")
+    parser.add_argument("--review", action="store_true", help="Open browser review tool after eval completes")
     return parser
 
 
@@ -678,7 +709,9 @@ def main():
         scenarios, args.model, args.claude_md, args.runs, args.timeout, args.workers, use_cache, use_subject_cache
     )
     base_passed, _ = print_results(results, f"Results — {args.claude_md.name}", metrics)
-    save_results(results, args.model, "baseline", metrics)
+    results_path = save_results(results, args.model, "baseline", metrics)
+    if args.review:
+        open_review(results_path)
 
     if args.mutate:
         print(f"\nRunning mutated config: {args.mutate}")
